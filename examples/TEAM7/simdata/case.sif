@@ -1,0 +1,179 @@
+Header
+  CHECK KEYWORDS "Warn"
+  Mesh DB "." "team7"
+  Results Directory "results"
+End
+
+!---------------------------------------------------------
+! Simulation setup
+!---------------------------------------------------------
+Simulation
+  Max Output Level = 7
+  Coordinate System = Cartesian
+  Simulation Type = Steady
+  Frequency = 50
+End
+
+Constants
+  Boltzmann Constant = 1.380649e-23
+  Permeability of Vacuum = 1.25663706127e-6
+  Permittivity of Vacuum = 8.8541878188e-12
+  Stefan Boltzmann = 5.6703744191844294e-8
+  Unit Charge = 1.602176634e-19
+End
+
+
+!---------------------------------------------------------
+! Solver configuration
+!---------------------------------------------------------
+! coil
+Equation 1
+  Active Solvers(4) = 1 2 3 4   ! CoilSolver, MGDynHarm, MGDynPost, ResultOutput
+End
+
+! domain
+Equation 2
+  Active Solvers(3) = 2 3 4   ! MGDynHarm, MGDynPost, ResultOutput
+End
+
+! CoilSolver
+Solver 1
+  Equation = CoilSolver
+  Exec Solver = Before All
+  Procedure = "CoilSolver" "CoilSolver"
+  Coil Closed = Logical True
+  Narrow Interface = Logical True
+  Normalize Coil Current = Logical True
+  Fix Input Current Density = Logical True
+  Single Coil Cut = Logical True
+  Save Coil Set = Logical False
+  Save Coil Index = Logical False
+  Calculate Nodal Fields = Logical True
+  Calculate Elemental Fields = Logical True
+  Steady State Convergence Tolerance = 1.0e-6
+  Linear System Solver = Iterative
+  Linear System Iterative Method = idrs
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System preconditioning = ILU0
+  Linear System Max Iterations = 3000
+  Linear System Residual Output = 1
+  Idrs Parameter = 4
+  Nonlinear System Consistent Norm = Logical True
+End
+
+! MGDynHarm
+Solver 2
+  Equation = MGDynHarm
+  Exec Solver = Always
+  Procedure = "MagnetoDynamics" "WhitneyAVHarmonicSolver"
+  Stabilize = Logical True
+  Optimize Bandwidth = Logical True
+  Use Elemental CoilCurrent = Logical True
+  Fix Input Current Density = Logical False
+  Steady State Convergence Tolerance = 1.0e-6
+  Linear System Solver = Iterative
+  Linear System Iterative Method = bicgstabl
+  Linear System GCR Restart = 400
+  Linear System Convergence Tolerance = 1.0e-7
+  Linear System preconditioning = none
+  Linear System Max Iterations = 3000
+  Linear System Residual Output = 10
+  Idrs Parameter = 4
+  BicgstabL polynomial degree = 6
+  Nonlinear System Max Iterations = 1
+  Nonlinear System Relaxation Factor = 1
+  Nonlinear System Consistent Norm = Logical True
+End
+
+! MGDynPost
+Solver 3
+  Equation = MGDynPost
+  Exec Solver = Always
+  Procedure = "MagnetoDynamics" "MagnetoDynamicsCalcFields"
+  Calculate Current Density = Logical True
+  Calculate Nodal Fields = Logical True
+  Calculate Elemental Fields = Logical True
+  Discontinuous Bodies = Logical True
+  Steady State Convergence Tolerance = 1.0e-6
+  Linear System Solver = Iterative
+  Linear System Symmetric = Logical True
+  Linear System Iterative Method = CG
+  Linear System Max Iterations = 5000
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Preconditioning = ILU0
+  Linear System Abort Not Converged = Logical False
+  Linear System Residual Output = 10
+  Nonlinear System Consistent Norm = Logical True
+End
+
+! ResultOutput
+Solver 4
+  Equation = ResultOutput
+  Exec Solver = After Timestep
+  Procedure = "ResultOutputSolve" "ResultOutputSolver"
+  Output Format = vtu
+  Output File Name = case
+  Save Geometry Ids = Logical True
+  No Matrix = Logical True
+End
+
+
+!---------------------------------------------------------
+! Materials
+!---------------------------------------------------------
+Material 1
+  Name = Air
+  Relative Permittivity = 1
+  Relative Permeability = 1
+End
+
+Material 2
+  Name = Aluminium
+  Electric Conductivity = 3.69e7
+  Relative Permittivity = 1
+  Relative Permeability = 1
+End
+
+
+!---------------------------------------------------------
+! Bodies & boundary conditions
+!---------------------------------------------------------
+Body 1
+  Name = Coil
+  Target Bodies(1) = 2
+  Equation = 1  ! coil
+  Material = 1  ! Air
+End
+
+Body 2
+  Name = Plate
+  Target Bodies(1) = 1
+  Equation = 2  ! domain
+  Material = 2  ! Aluminium
+End
+
+Body 3
+  Name = Domain
+  Target Bodies(1) = 3
+  Equation = 2  ! domain
+  Material = 1  ! Air
+End
+
+Boundary Condition 1
+  Name = Inf
+  Target Boundaries(1) = 1
+  AV {e} = 0
+End
+
+
+!---------------------------------------------------------
+! Components
+!---------------------------------------------------------
+Component 1
+  Name = Coil
+  Master Bodies(1) = 1  ! Coil
+  Coil Type = "Stranded"
+  Number of Turns = 1
+  Desired Coil Current = -2742
+End
+

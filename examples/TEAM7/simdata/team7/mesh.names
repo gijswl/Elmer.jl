@@ -1,0 +1,6 @@
+! ----- names for bodies -----
+$ Plate = 1
+$ Coil = 2
+$ Domain = 3
+! ----- names for boundaries -----
+$ outer = 1

@@ -1,0 +1,20 @@
+name = "Elmer"
+uuid = "7d1d0d61-b954-47ad-902e-083a93170a02"
+authors = ["gwlagerweij"]
+version = "0.1.0"
+
+[deps]
+Gmsh = "705231aa-382f-11e9-3f0c-b7cb4346fdeb"
+OrderedCollections = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+PhysicalConstants = "5ad8b20f-a522-5ce9-bfc9-ddf1d5bda6ab"
+Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+YAML = "ddb6d928-2868-570f-bddf-ab3f9cf99eb6"
+
+[compat]
+Gmsh = "0.3.1"
+OrderedCollections = "1.8.1"
+PhysicalConstants = "0.2.4"
+Printf = "1.11.0"
+Unitful = "1.24.0"
+YAML = "0.4.14"

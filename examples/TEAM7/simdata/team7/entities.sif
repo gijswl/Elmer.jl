@@ -1,0 +1,18 @@
+!------ Skeleton for body section -----
+Body 1
+  Name = Plate
+End
+
+Body 2
+  Name = Coil
+End
+
+Body 3
+  Name = Domain
+End
+
+!------ Skeleton for boundary section -----
+Boundary Condition 1
+  Name = outer
+End
+
