@@ -44,4 +44,4 @@ model.addPhysicalGroup(3, [1], 1, "Plate")
 model.addPhysicalGroup(3, [2], 2, "Coil")
 model.addPhysicalGroup(3, [3], 3, "Domain")
 
-gmsh.write("examples/TEAM7/simdata/team7.msh")
+gmsh.write(joinpath(@__DIR__, "simdata" , "team7.msh"))

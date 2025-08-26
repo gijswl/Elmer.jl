@@ -51,7 +51,7 @@ Solver 1
   Linear System Residual Output = 10
   Linear System Precondition Recompute = 1
   Steady State Convergence Tolerance = 1.0e-5
-  Quadratic Approximation = Logical False
+  Quadratic Approximation = Logical True
 End
 
 ! VectorHelmholtzPost
@@ -106,8 +106,8 @@ End
 ! Bodies & boundary conditions
 !---------------------------------------------------------
 Body 1
-  Name = waveguide
-  Target Bodies(1) = 4
+  Name = Waveguide
+  Target Bodies(1) = 1
   Equation = 1  ! main
   Material = 1  ! Air
 End

@@ -1,6 +1,6 @@
 !------ Skeleton for body section -----
 Body 1
-  Name = body4
+  Name = Waveguide
 End
 
 !------ Skeleton for boundary section -----
@@ -14,9 +14,5 @@ End
 
 Boundary Condition 3
   Name = PEC
-End
-
-Boundary Condition 4
-  Name = bnry4
 End
 

@@ -9,7 +9,7 @@ VectorHelmholtzSolver:
   Linear System Max Iterations: 500
   Linear System Convergence Tolerance: 1.0e-6
   BiCGstabl polynomial degree: 6
-  Linear System Preconditioning: ILUT
+  Linear System Preconditioning: vanka
   Linear System Preconditioning Damp Coefficient im: 1.0
   Linear System ILUT Tolerance: 1.0e-3
   Linear System Abort Not Converged: False

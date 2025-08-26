@@ -20,7 +20,8 @@ simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady()
 sif = SolverInformationFile("case", simulation, data_path="examples/bent_waveguide/simdata/", mesh_db="bent_waveguide")
 
 solver_helmholtz = load_solver!(sif, "VectorHelmholtzSolver", Elmer.ExecAlways(), "examples/bent_waveguide/solvers.yml")
-update_solver_data!(sif, solver_helmholtz, "Quadratic Approximation", false)
+update_solver_data!(sif, solver_helmholtz, "Linear System Preconditioning", "ILUT")
+update_solver_data!(sif, solver_helmholtz, "Quadratic Approximation", true)
 post_helmholtz = load_solver!(sif, "VectorHelmholtzPost", Elmer.ExecAlways(), "examples/bent_waveguide/solvers.yml")
 solver_result = load_solver!(sif, "ResultOutputSolver", Elmer.ExecAfterStep(), "examples/bent_waveguide/solvers.yml")
 
@@ -29,7 +30,7 @@ eqn = add_equation!(sif, "main", [solver_helmholtz, post_helmholtz, solver_resul
 # Define physical bodies
 mat_air = add_material!(sif, "Air"; data=OrderedDict("Relative Permittivity" => 1, "Relative Permeability" => 1))
 
-bdy_wg = add_body!(sif, "waveguide", [4]; equation=eqn, material=mat_air)
+bdy_wg = add_body!(sif, "Waveguide", [1]; equation=eqn, material=mat_air)
 
 bnd_pec = add_boundary_condition!(sif, "PEC", [3]; data=OrderedDict("E re {e}" => 0.0, "E im {e}" => 0.0))
 bnd_in = add_boundary_condition!(sif, "Port in", [1]; data=OrderedDict(
@@ -41,4 +42,5 @@ bnd_out = add_boundary_condition!(sif, "Port out", [2]; data=OrderedDict("Electr
 Elmer.write(sif)
 Elmer.write_startinfo(sif)
 
+Elmer.elmergrid_gmsh(sif.data_path, "bent_waveguide.msh")
 Elmer.run_elmer_solver(sif)
