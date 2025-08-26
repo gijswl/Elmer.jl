@@ -425,7 +425,7 @@ end
 function write(sif::SolverInformationFile)
     ~isdir(sif.data_path) && mkdir(sif.data_path)
 
-    open("$(sif.data_path)/$(sif.filename)", "w") do file
+    open(joinpath(sif.data_path, sif.filename), "w") do file
         write_header(file, sif)
 
         Base.write(file, "!---------------------------------------------------------\n")
@@ -467,7 +467,7 @@ end
 function write_startinfo(sif::SolverInformationFile)
     @assert isdir(sif.data_path) "STARTINFO can only be written after generating the SIF"
 
-    open("$(sif.data_path)/ELMERSOLVER_STARTINFO", "w") do file
+    open(joinpath(sif.data_path, "ELMERSOLVER_STARTINFO"), "w") do file
         Base.write(file, "$(sif.filename)\n")
     end
 end
