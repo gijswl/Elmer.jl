@@ -28,12 +28,12 @@ End
 !---------------------------------------------------------
 ! coil
 Equation 1
-  Active Solvers(4) = 1 2 3 4   ! CoilSolver, MGDynHarm, MGDynPost, ResultOutput
+  Active Solvers(4) = 1 2 3 4   ! CoilSolver, MGDynHarm, MGDynPost, SaveScalars
 End
 
 ! domain
 Equation 2
-  Active Solvers(3) = 2 3 4   ! MGDynHarm, MGDynPost, ResultOutput
+  Active Solvers(2) = 2 3   ! MGDynHarm, MGDynPost
 End
 
 ! CoilSolver
@@ -45,9 +45,10 @@ Solver 1
   Narrow Interface = Logical True
   Normalize Coil Current = Logical True
   Fix Input Current Density = Logical True
+  Coil Conductivity Fix = Logical True
   Single Coil Cut = Logical True
-  Save Coil Set = Logical False
-  Save Coil Index = Logical False
+  Save Coil Set = Logical True
+  Save Coil Index = Logical True
   Calculate Nodal Fields = Logical True
   Calculate Elemental Fields = Logical True
   Steady State Convergence Tolerance = 1.0e-6
@@ -55,10 +56,9 @@ Solver 1
   Linear System Iterative Method = idrs
   Linear System Convergence Tolerance = 1.0e-8
   Linear System preconditioning = ILU0
-  Linear System Max Iterations = 3000
-  Linear System Residual Output = 1
+  Linear System Max Iterations = 5000
+  Linear System Residual Output = 10
   Idrs Parameter = 4
-  Nonlinear System Consistent Norm = Logical True
 End
 
 ! MGDynHarm
@@ -72,17 +72,16 @@ Solver 2
   Fix Input Current Density = Logical False
   Steady State Convergence Tolerance = 1.0e-6
   Linear System Solver = Iterative
+  Linear System Complex = Logical True
+  Linear System Symmetric = Logical True
+  Linear System Robust = Logical True
   Linear System Iterative Method = bicgstabl
-  Linear System GCR Restart = 400
-  Linear System Convergence Tolerance = 1.0e-7
-  Linear System preconditioning = none
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Abort Not Converged = Logical False
+  Linear System Preconditioning = none
   Linear System Max Iterations = 3000
   Linear System Residual Output = 10
-  Idrs Parameter = 4
-  BicgstabL polynomial degree = 6
-  Nonlinear System Max Iterations = 1
-  Nonlinear System Relaxation Factor = 1
-  Nonlinear System Consistent Norm = Logical True
+  BicgstabL polynomial degree = 4
 End
 
 ! MGDynPost
@@ -90,7 +89,9 @@ Solver 3
   Equation = MGDynPost
   Exec Solver = Always
   Procedure = "MagnetoDynamics" "MagnetoDynamicsCalcFields"
+  Separate Magnetic Energy = Logical True
   Calculate Current Density = Logical True
+  Calculate Joule Heating = Logical True
   Calculate Nodal Fields = Logical True
   Calculate Elemental Fields = Logical True
   Discontinuous Bodies = Logical True
@@ -98,23 +99,32 @@ Solver 3
   Linear System Solver = Iterative
   Linear System Symmetric = Logical True
   Linear System Iterative Method = CG
-  Linear System Max Iterations = 5000
   Linear System Convergence Tolerance = 1.0e-8
-  Linear System Preconditioning = ILU0
   Linear System Abort Not Converged = Logical False
+  Linear System Preconditioning = ILU0
+  Linear System Max Iterations = 5000
   Linear System Residual Output = 10
-  Nonlinear System Consistent Norm = Logical True
+End
+
+! SaveScalars
+Solver 4
+  Equation = SaveScalars
+  Exec Solver = Always
+  Procedure = "SaveData" "SaveScalars"
+  Filename = scalars1.dat
+  Parallel Reduce = Logical True
 End
 
 ! ResultOutput
-Solver 4
+Solver 5
   Equation = ResultOutput
   Exec Solver = After Timestep
   Procedure = "ResultOutputSolve" "ResultOutputSolver"
   Output Format = vtu
-  Output File Name = case
+  Output File Name = case1
   Save Geometry Ids = Logical True
   No Matrix = Logical True
+  Single Precision = Logical True
 End
 
 
@@ -172,8 +182,10 @@ End
 Component 1
   Name = Coil
   Master Bodies(1) = 1  ! Coil
-  Coil Type = "Stranded"
+  Coil Type = Stranded
   Number of Turns = 1
-  Desired Coil Current = -2742
+  Desired Coil Current = 2742
+  Coil Use W Vector = Logical True
+  W Vector Variable Name = String "CoilCurrent e"
 End
 
