@@ -1,0 +1,22 @@
+!------ Skeleton for body section -----
+Body 1
+  Name = body4
+End
+
+!------ Skeleton for boundary section -----
+Boundary Condition 1
+  Name = Input
+End
+
+Boundary Condition 2
+  Name = Output
+End
+
+Boundary Condition 3
+  Name = PEC
+End
+
+Boundary Condition 4
+  Name = bnry4
+End
+

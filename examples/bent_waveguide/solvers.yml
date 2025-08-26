@@ -1,0 +1,49 @@
+VectorHelmholtzSolver:
+  Procedure: '"VectorHelmholtz" "VectorHelmholtzSolver"'
+  Variable: E[E re:1 E im:1]
+  Stabilize: True
+  Optimize Bandwidth: True
+
+  Linear System Solver: Iterative
+  Linear System Iterative Method: BiCGStab
+  Linear System Max Iterations: 500
+  Linear System Convergence Tolerance: 1.0e-6
+  BiCGstabl polynomial degree: 6
+  Linear System Preconditioning: ILUT
+  Linear System Preconditioning Damp Coefficient im: 1.0
+  Linear System ILUT Tolerance: 1.0e-3
+  Linear System Abort Not Converged: False
+  Linear System Residual Output: 10
+  Linear System Precondition Recompute: 1
+  Steady State Convergence Tolerance: 1.0e-5
+  
+VectorHelmholtzPost:
+  Procedure: '"VectorHelmholtz" "VectorHelmholtzCalcFields"'
+  Field Variable: E
+  Stabilize: True
+  Optimize Bandwidth: True
+
+  Calculate Electric Field: True
+  Calculate Energy Functional: True
+  Calculate Magnetic Field Strength: True
+  Calculate Poynting Vector: True
+
+  Linear System Solver: Iterative
+  Linear System Iterative Method: BiCGStab
+  Linear System Max Iterations: 500
+  Linear System Convergence Tolerance: 1.0e-10
+  BiCGstabl polynomial degree: 2
+  Linear System Preconditioning: ILU0
+  Linear System ILUT Tolerance: 1.0e-3
+  Linear System Abort Not Converged: False
+  Linear System Residual Output: 10
+  Linear System Precondition Recompute: 1
+  Steady State Convergence Tolerance: 1.0e-5
+
+ResultOutputSolver:
+  Exec Solver: 'After timestep'
+  Equation: ResultOutputSolver
+  Procedure: '"ResultOutputSolve" "ResultOutputSolver"'
+  Vtu format: 'Logical True'
+  Output File Name: case
+  Save Geometry Ids: 'Logical True'

@@ -150,7 +150,7 @@ function add_constant!(sif::SolverInformationFile, name::String, value)
     sif.constants[name] = value
 end
 
-function add_solver!(sif::SolverInformationFile, name::String, exec::ExecSolver, data::OrderedDict)
+function add_solver!(sif::SolverInformationFile, name::String, exec::ExecSolver; data::OrderedDict=OrderedDict())
     id = length(sif.solvers) + 1
     solver = Solver(id, name, exec, data)
     push!(sif.solvers, solver)
@@ -164,46 +164,102 @@ function add_equation!(sif::SolverInformationFile, name::String, solvers::Vector
     return id
 end
 
-function add_material!(sif::SolverInformationFile, name::String, data::OrderedDict)
+function add_material!(sif::SolverInformationFile, name::String; data::OrderedDict=OrderedDict())
     id = length(sif.materials) + 1
     material = Material(id, name, data)
     push!(sif.materials, material)
     return id
 end
 
-function add_body!(sif::SolverInformationFile, name::String, target_bodies::Vector{Int}=Int[]; equation=missing, material=missing, body_force=missing, initial_condition=missing)
+function add_body!(sif::SolverInformationFile, name::String, target_bodies::Vector{Int}=Int[]; equation=missing, material=missing, body_force=missing, initial_condition=missing, data::OrderedDict=OrderedDict())
     id = length(sif.bodies) + 1
-    body = Body(id, name, target_bodies, equation, material, body_force, initial_condition, OrderedDict())
+    body = Body(id, name, target_bodies, equation, material, body_force, initial_condition, data)
     push!(sif.bodies, body)
     return id
 end
 
-function add_body_force!(sif::SolverInformationFile, name::String, data::OrderedDict)
+function add_body_force!(sif::SolverInformationFile, name::String; data::OrderedDict=OrderedDict())
     id = length(sif.body_forces) + 1
     body_force = BodyForce(id, name, data)
     push!(sif.body_forces, body_force)
     return id
 end
 
-function add_initial_condition!(sif::SolverInformationFile, name::String, data::OrderedDict)
+function add_initial_condition!(sif::SolverInformationFile, name::String; data::OrderedDict=OrderedDict())
     id = length(sif.initial_conditions) + 1
     initial_condition = InitialCondition(id, name, data)
     push!(sif.initial_conditions, initial_condition)
     return id
 end
 
-function add_boundary_condition!(sif::SolverInformationFile, name::String, data::OrderedDict, target_boundaries::Vector{Int}=Int[])
+function add_boundary_condition!(sif::SolverInformationFile, name::String, target_boundaries::Vector{Int}=Int[]; data::OrderedDict=OrderedDict())
     id = length(sif.boundary_conditions) + 1
     boundary_condition = BoundaryCondition(id, name, target_boundaries, data)
     push!(sif.boundary_conditions, boundary_condition)
     return id
 end
 
-function add_component!(sif::SolverInformationFile, name::String, data::OrderedDict; master_bodies::Vector{Int}=Int[], master_boundaries::Vector{Int}=Int[])
+function add_component!(sif::SolverInformationFile, name::String; master_bodies::Vector{Int}=Int[], master_boundaries::Vector{Int}=Int[], data::OrderedDict=OrderedDict())
     id = length(sif.components) + 1
     component = Component(id, name, master_bodies, master_boundaries, data)
     push!(sif.components, component)
     return id
+end
+
+function update_solver_data!(sif::SolverInformationFile, solver_id::Int, data::OrderedDict)
+    solver = sif.solvers[solver_id]
+    for (key, val) ∈ data
+        solver.data[key] = val
+    end
+end
+
+function update_solver_data!(sif::SolverInformationFile, solver_id::Int, key::String, value)
+    solver = sif.solvers[solver_id]
+    solver.data[key] = value
+end
+
+function update_material_data!(sif::SolverInformationFile, material_id::Int, data::OrderedDict)
+    material = sif.materials[material_id]
+    for (key, val) ∈ data
+        material.data[key] = val
+    end
+end
+
+function update_material_data!(sif::SolverInformationFile, material_id::Int, key::String, value)
+    material = sif.materials[material_id]
+    material.data[key] = value
+end
+
+function update_body_data!(sif::SolverInformationFile, body_id::Int, data::OrderedDict)
+    body = sif.bodies[body_id]
+    for (key, val) ∈ data
+        body.data[key] = val
+    end
+end
+
+function update_body_data!(sif::SolverInformationFile, body_id::Int, key::String, value)
+    body = sif.bodies[body_id]
+    body.data[key] = value
+end
+
+function update_bf_data!(sif::SolverInformationFile, bf_id::Int, key::String, value)
+    body_force = sif.body_forces[bf_id]
+    body_force.data[key] = value
+end
+
+function update_ic_data!(sif::SolverInformationFile, ic_id::Int, key::String, value)
+    initial_condition = sif.initial_conditions[ic_id]
+    initial_condition.data[key] = value
+end
+
+function update_bc_data!(sif::SolverInformationFile, bc_id::Int, key::String, value)
+    boundary_condition = sif.boundary_conditions[bc_id]
+    boundary_condition.data[key] = value
+end
+
+function update_component_data!(sif::SolverInformationFile, component_id::Int, key::String, value)
+    component = sif.components[component_id]
+    component.data[key] = value
 end
 
 function write_header(io::IOStream, sif::SolverInformationFile)

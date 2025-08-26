@@ -1,0 +1,7 @@
+! ----- names for bodies -----
+$ body4 = 4
+! ----- names for boundaries -----
+$ Input = 1
+$ Output = 2
+$ PEC = 3
+$ bnry4 = 4

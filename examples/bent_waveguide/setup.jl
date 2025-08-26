@@ -1,0 +1,44 @@
+using Elmer
+using OrderedCollections
+
+using Unitful
+using PhysicalConstants.CODATA2022
+
+# Parameter definition
+f = 2.5e9
+a = 10e-2
+b = 5e-2
+
+ω = 2π * f
+c0 = ustrip(SpeedOfLightInVacuum)
+k0 = ω / c0
+kc = π / a
+β0 = √(k0^2 - kc^2)
+
+# Set up simulation
+simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(), 1, OrderedDict("Frequency" => f))
+sif = SolverInformationFile("case", simulation, data_path="examples/bent_waveguide/simdata/", mesh_db="bent_waveguide")
+
+solver_helmholtz = load_solver!(sif, "VectorHelmholtzSolver", Elmer.ExecAlways(), "examples/bent_waveguide/solvers.yml")
+update_solver_data!(sif, solver_helmholtz, "Quadratic Approximation", false)
+post_helmholtz = load_solver!(sif, "VectorHelmholtzPost", Elmer.ExecAlways(), "examples/bent_waveguide/solvers.yml")
+solver_result = load_solver!(sif, "ResultOutputSolver", Elmer.ExecAfterStep(), "examples/bent_waveguide/solvers.yml")
+
+eqn = add_equation!(sif, "main", [solver_helmholtz, post_helmholtz, solver_result])
+
+# Define physical bodies
+mat_air = add_material!(sif, "Air"; data=OrderedDict("Relative Permittivity" => 1, "Relative Permeability" => 1))
+
+bdy_wg = add_body!(sif, "waveguide", [4]; equation=eqn, material=mat_air)
+
+bnd_pec = add_boundary_condition!(sif, "PEC", [3]; data=OrderedDict("E re {e}" => 0.0, "E im {e}" => 0.0))
+bnd_in = add_boundary_condition!(sif, "Port in", [1]; data=OrderedDict(
+    "Magnetic Boundary Load 2" => "Variable Coordinate 1; Real MATC \"-2 * $β0 * $k0 / $kc * sin($kc * (tx + $a/2))\"",
+    "Electric Robin Coefficient im" => β0))
+bnd_out = add_boundary_condition!(sif, "Port out", [2]; data=OrderedDict("Electric Robin Coefficient im" => β0))
+
+# Write SIF & run
+Elmer.write(sif)
+Elmer.write_startinfo(sif)
+
+Elmer.run_elmer_solver(sif)

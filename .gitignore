@@ -34,4 +34,6 @@ Manifest.toml
 # Byproducts from examples
 *.msh
 *.log
+
+*.vtu
 *.pvsm
