@@ -10,8 +10,12 @@ End
 Simulation
   Max Output Level = 7
   Coordinate System = Cartesian
-  Simulation Type = Steady
-  Frequency = 50
+  Simulation Type = Scanning
+  Timestep Intervals = 3
+  Output Intervals = 1
+  Steady State Max Iterations = 1
+  $ f = 50 100 200
+  Frequency = Variable timestep; Real MATC "f(tx-1)"
 End
 
 Constants
@@ -111,7 +115,7 @@ Solver 4
   Equation = SaveScalars
   Exec Solver = Always
   Procedure = "SaveData" "SaveScalars"
-  Filename = scalars1.dat
+  Filename = scalars.dat
   Parallel Reduce = Logical True
 End
 
@@ -121,7 +125,7 @@ Solver 5
   Exec Solver = After Timestep
   Procedure = "ResultOutputSolve" "ResultOutputSolver"
   Output Format = vtu
-  Output File Name = case1
+  Output File Name = case
   Save Geometry Ids = Logical True
   No Matrix = Logical True
   Single Precision = Logical True
