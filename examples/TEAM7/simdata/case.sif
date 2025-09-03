@@ -11,10 +11,10 @@ Simulation
   Max Output Level = 7
   Coordinate System = Cartesian
   Simulation Type = Scanning
-  Timestep Intervals = 3
+  Timestep Intervals = 1
   Output Intervals = 1
   Steady State Max Iterations = 1
-  $ f = 50 100 200
+  $ f = 50
   Frequency = Variable timestep; Real MATC "f(tx-1)"
 End
 
@@ -136,7 +136,7 @@ End
 ! Materials
 !---------------------------------------------------------
 Material 1
-  Name = Air
+  Name = Coil
   Relative Permittivity = 1
   Relative Permeability = 1
 End
@@ -144,6 +144,13 @@ End
 Material 2
   Name = Aluminium
   Electric Conductivity = 3.69e7
+  Relative Permittivity = 1
+  Relative Permeability = 1
+End
+
+Material 3
+  Name = Air
+  Electric Conductivity = 0.0
   Relative Permittivity = 1
   Relative Permeability = 1
 End
@@ -156,7 +163,7 @@ Body 1
   Name = Coil
   Target Bodies(1) = 2
   Equation = 1  ! coil
-  Material = 1  ! Air
+  Material = 1  ! Coil
 End
 
 Body 2
@@ -170,7 +177,7 @@ Body 3
   Name = Domain
   Target Bodies(1) = 3
   Equation = 2  ! domain
-  Material = 1  ! Air
+  Material = 3  ! Air
 End
 
 Boundary Condition 1

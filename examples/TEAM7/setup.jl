@@ -2,7 +2,8 @@ using Elmer
 using OrderedCollections
 
 # Parameter definition
-frequency = [50, 100, 200]
+# frequency = [50, 100, 200]
+frequency = [50]
 
 # Set up simulation
 simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(), 1, OrderedDict(
@@ -31,10 +32,11 @@ eq_coil = add_equation!(sif, "coil", [solver_coil, solver_mgharm, post_mgharm, s
 eq_domain = add_equation!(sif, "domain", [solver_mgharm, post_mgharm])
 
 # Define physical bodies
-mat_air = Elmer.load_material!(sif, "Air", materials_db)
+mat_coil = add_material!(sif, "Coil", data=OrderedDict("Relative Permittivity" => 1, "Relative Permeability" => 1))
 mat_aluminium = Elmer.load_material!(sif, "Aluminium", materials_db)
+mat_air = Elmer.load_material!(sif, "Air", materials_db)
 
-body_coil = add_body!(sif, "Coil", [2]; equation=eq_coil, material=mat_air)
+body_coil = add_body!(sif, "Coil", [2]; equation=eq_coil, material=mat_coil)
 body_plate = add_body!(sif, "Plate", [1]; equation=eq_domain, material=mat_aluminium)
 body_domain = add_body!(sif, "Domain", [3]; equation=eq_domain, material=mat_air)
 
