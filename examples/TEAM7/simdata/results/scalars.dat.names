@@ -1,9 +1,9 @@
 Metadata for SaveScalars file: results/scalars.dat
 Elmer version: 9.0
 Elmer revision: Release
-Elmer compilation date: 2025-07-19
+Elmer compilation date: 2025-09-04
 Solver input file: case.sif
-File started at: 2025/09/03 11:58:04
+File started at: 2025/09/05 07:51:50
  
 Variables in columns of matrix: 
    1: res: eddy current power

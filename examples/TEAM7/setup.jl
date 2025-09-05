@@ -2,8 +2,7 @@ using Elmer
 using OrderedCollections
 
 # Parameter definition
-# frequency = [50, 100, 200]
-frequency = [50]
+frequency = [50, 100, 200]
 
 # Set up simulation
 simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(), 1, OrderedDict(
@@ -22,6 +21,8 @@ sif = SolverInformationFile("case", simulation, data_path=data_path, mesh_db="te
 
 solver_coil = load_solver!(sif, "CoilSolver", Elmer.ExecBeforeAll(), solvers_db)
 solver_mgharm = load_solver!(sif, "MGDynHarm", Elmer.ExecAlways(), solvers_db)
+update_solver_data!(sif, solver_mgharm, "Linear System Nullify Guess", true)
+
 post_mgharm = load_solver!(sif, "MGDynPost", Elmer.ExecAlways(), solvers_db)
 save_scalars = load_solver!(sif, "SaveScalars", Elmer.ExecAlways(), solvers_db)
 save_result = load_solver!(sif, "ResultOutput", Elmer.ExecAfterStep(), solvers_db)
@@ -42,12 +43,12 @@ body_domain = add_body!(sif, "Domain", [3]; equation=eq_domain, material=mat_air
 
 bc_inf = add_boundary_condition!(sif, "Inf", [1]; data=OrderedDict("AV {e}" => 0))
 
-component = add_component!(sif, "Coil", data=OrderedDict(
-        "Coil Type" => "Stranded",
-        "Number of Turns" => 1,
-        "Desired Coil Current" => 2742,
-        "Coil Use W Vector" => true,
-        "W Vector Variable Name" => "String \"CoilCurrent e\""); master_bodies=[body_coil])
+component = add_component!(sif, "Coil", master_bodies=[body_coil], data=OrderedDict(
+    "Coil Type" => "Stranded",
+    "Number of Turns" => 1,
+    "Desired Coil Current" => 2742,
+    "Coil Use W Vector" => true,
+    "W Vector Variable Name" => "String \"CoilCurrent e\""))
 
 # Write SIF & run
 Elmer.write(sif)
