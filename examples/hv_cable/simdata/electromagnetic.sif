@@ -1,0 +1,232 @@
+Header
+  CHECK KEYWORDS "Warn"
+  Mesh DB "." "electromagnetic"
+  Results Directory "results"
+End
+
+!---------------------------------------------------------
+! Simulation setup
+!---------------------------------------------------------
+Simulation
+  Max Output Level = 7
+  Coordinate System = Cartesian
+  Simulation Type = Steady
+  Coordinate Scaling = 0.001
+  Timestep Intervals = 1
+  Output Intervals = 1
+  Steady State Max Iterations = 1
+  Frequency = 50
+End
+
+Constants
+  Boltzmann Constant = 1.380649e-23
+  Permeability of Vacuum = 1.25663706127e-6
+  Permittivity of Vacuum = 8.8541878188e-12
+  Stefan Boltzmann = 5.6703744191844294e-8
+  Unit Charge = 1.602176634e-19
+End
+
+
+!---------------------------------------------------------
+! Solver configuration
+!---------------------------------------------------------
+! Domain
+Equation 1
+  Active Solvers(6) = 1 2 3 4 5 6   ! CircuitSolver, MGDynHarm2D, MGDynPost2D, CircuitPost, ResultOutput, SaveScalars
+End
+
+! CircuitSolver
+Solver 1
+  Equation = CircuitSolver
+  Exec Solver = Always
+  Procedure = "CircuitsAndDynamics" "CircuitsAndDynamicsHarmonic"
+  Variable = X
+  No Matrix = Logical True
+End
+
+! MGDynHarm2D
+Solver 2
+  Equation = MGDynHarm2D
+  Exec Solver = Always
+  Procedure = "MagnetoDynamics2D" "MagnetoDynamics2DHarmonic"
+  Stabilize = Logical True
+  Optimize Bandwidth = Logical True
+  Export Lagrange Multiplier = Logical True
+  Steady State Convergence Tolerance = 1.0e-6
+  Linear System Solver = Iterative
+  Linear System Complex = Logical True
+  Linear System Symmetric = Logical True
+  Linear System Robust = Logical True
+  Linear System Iterative Method = bicgstabl
+  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Abort Not Converged = Logical False
+  Linear System Preconditioning = none
+  Linear System Max Iterations = 1000
+  Linear System Residual Output = 10
+  BicgstabL polynomial degree = 6
+  Quadratic Approximation = Logical True
+End
+
+! MGDynPost2D
+Solver 3
+  Equation = MGDynPost2D
+  Exec Solver = Always
+  Procedure = "MagnetoDynamics" "MagnetoDynamicsCalcFields"
+  Stabilize = Logical True
+  Optimize Bandwidth = Logical True
+  Calculate Current Density = Logical True
+  Calculate Joule Heating = Logical True
+  Steady State Convergence Tolerance = 1.0e-6
+  Linear System Solver = Direct
+  Linear System Complex = Logical True
+  Linear System Symmetric = Logical True
+  Linear System Robust = Logical True
+  Linear System Direct Method = UMFPACK
+  Linear System Convergence Tolerance = 1.0e-7
+End
+
+! CircuitPost
+Solver 4
+  Equation = CircuitPost
+  Exec Solver = Always
+  Procedure = "CircuitsAndDynamics" "CircuitsOutput"
+End
+
+! ResultOutput
+Solver 5
+  Equation = ResultOutput
+  Exec Solver = After Timestep
+  Procedure = "ResultOutputSolve" "ResultOutputSolver"
+  Output File Name = electromagnetic
+  Output Format = vtu
+  Save Geometry IDs = Logical True
+  No Matrix = Logical True
+  Single Precision = Logical True
+End
+
+! SaveScalars
+Solver 6
+  Equation = SaveScalars
+  Exec Solver = Always
+  Procedure = "SaveData" "SaveScalars"
+  Filename = electromagnetic.dat
+  Variable 1 = joule heating e
+  Mask Name 1 = Conductor1
+  Operator 1 = body int
+  Variable 2 = joule heating e
+  Mask Name 2 = Conductor2
+  Operator 2 = body int
+  Variable 3 = joule heating e
+  Mask Name 3 = Conductor3
+  Operator 3 = body int
+  Variable 4 = joule heating e
+  Mask Name 4 = Sheath
+  Operator 4 = body int
+End
+
+
+!---------------------------------------------------------
+! Materials
+!---------------------------------------------------------
+Material 1
+  Name = Air
+  Electric Conductivity = 0.0
+  Relative Permittivity = 1
+  Relative Permeability = 1
+End
+
+Material 2
+  Name = Aluminium
+  Electric Conductivity = 3.69e7
+  Relative Permittivity = 1
+  Relative Permeability = 1
+End
+
+Material 3
+  Name = Copper
+  Electric Conductivity = 5.85e7
+  Relative Permittivity = 1
+  Relative Permeability = 1
+End
+
+Material 4
+  Name = XLPE
+  Electric Conductivity = 0.0
+  Relative Permittivity = 2.3
+  Relative Permeability = 1
+End
+
+Material 5
+  Name = HDPE
+  Electric Conductivity = 0.0
+  Relative Permittivity = 2.3
+  Relative Permeability = 1
+End
+
+
+!---------------------------------------------------------
+! Bodies & boundary conditions
+!---------------------------------------------------------
+Body 1
+  Name = Conductor1
+  Target Bodies(1) = 1
+  Equation = 1  ! Domain
+  Material = 2  ! Aluminium
+  Conductor1 = Logical True
+End
+
+Body 2
+  Name = Conductor2
+  Target Bodies(1) = 2
+  Equation = 1  ! Domain
+  Material = 2  ! Aluminium
+  Conductor2 = Logical True
+End
+
+Body 3
+  Name = Conductor3
+  Target Bodies(1) = 3
+  Equation = 1  ! Domain
+  Material = 2  ! Aluminium
+  Conductor3 = Logical True
+End
+
+Body 4
+  Name = Insulation
+  Target Bodies(1) = 4
+  Equation = 1  ! Domain
+  Material = 4  ! XLPE
+End
+
+Body 5
+  Name = Sheath
+  Target Bodies(1) = 5
+  Equation = 1  ! Domain
+  Material = 3  ! Copper
+  Sheath = Logical True
+End
+
+Body 6
+  Name = Jacket
+  Target Bodies(1) = 6
+  Equation = 1  ! Domain
+  Material = 5  ! HDPE
+End
+
+Body 7
+  Name = Air
+  Target Bodies(1) = 7
+  Equation = 1  ! Domain
+  Material = 1  ! Air
+End
+
+Boundary Condition 1
+  Name = Inf
+  Target Boundaries(1) = 1
+  Infinity BC = Logical True
+End
+
+
+!---------------------------------------------------------
+! Components
+!---------------------------------------------------------

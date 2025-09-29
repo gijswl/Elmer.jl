@@ -1,0 +1,34 @@
+!------ Skeleton for body section -----
+Body 1
+  Name = Conductor1
+End
+
+Body 2
+  Name = Conductor2
+End
+
+Body 3
+  Name = Conductor3
+End
+
+Body 4
+  Name = Insulation
+End
+
+Body 5
+  Name = Sheath
+End
+
+Body 6
+  Name = Core jacket
+End
+
+Body 7
+  Name = Air
+End
+
+!------ Skeleton for boundary section -----
+Boundary Condition 1
+  Name = Boundary
+End
+

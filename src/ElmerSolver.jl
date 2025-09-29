@@ -171,8 +171,15 @@ function add_material!(sif::SolverInformationFile, name::String; data::OrderedDi
     return id
 end
 
-function add_body!(sif::SolverInformationFile, name::String, target_bodies::Vector{Int}=Int[]; equation=missing, material=missing, body_force=missing, initial_condition=missing, data::OrderedDict=OrderedDict())
+function add_body!(sif::SolverInformationFile, name::String, target_bodies::Vector{Int}=Int[]; equation=missing, material=missing, body_force=missing, initial_condition=missing, mask = missing, data::OrderedDict=OrderedDict())
     id = length(sif.bodies) + 1
+
+    if(~ismissing(mask))
+        for m ∈ mask
+            data[m] = true
+        end
+    end
+
     body = Body(id, name, target_bodies, equation, material, body_force, initial_condition, data)
     push!(sif.bodies, body)
     return id

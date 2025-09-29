@@ -1,0 +1,51 @@
+Metadata for SaveScalars file: results/electromagnetic.dat
+Elmer version: 9.0
+Elmer revision: Release
+Elmer compilation date: 2025-09-04
+Solver input file: electromagnetic.sif
+File started at: 2025/09/23 16:30:14
+ 
+Variables in columns of matrix: 
+   1: body int: joule heating e mask conductor1
+   2: body int: joule heating e mask conductor2
+   3: body int: joule heating e mask conductor3
+   4: body int: joule heating e mask sheath
+   5: res: eddy current power
+   6: res: electromagnetic field energy
+   7: res: time
+   8: res: i_i1 re
+   9: res: i_i1 im
+  10: res: i_i2 re
+  11: res: i_i2 im
+  12: res: i_i3 re
+  13: res: i_i3 im
+  14: res: i_component(1) re
+  15: res: i_component(1) im
+  16: res: i_component(2) re
+  17: res: i_component(2) im
+  18: res: i_component(3) re
+  19: res: i_component(3) im
+  20: res: v_i1 re
+  21: res: v_i1 im
+  22: res: v_i2 re
+  23: res: v_i2 im
+  24: res: v_i3 re
+  25: res: v_i3 im
+  26: res: v_component(1) re
+  27: res: v_component(1) im
+  28: res: v_component(2) re
+  29: res: v_component(2) im
+  30: res: v_component(3) re
+  31: res: v_component(3) im
+  32: res: u_1_circuit_1 re
+  33: res: u_1_circuit_1 im
+  34: res: u_3_circuit_1 re
+  35: res: u_3_circuit_1 im
+  36: res: u_4_circuit_1 re
+  37: res: u_4_circuit_1 im
+  38: res: r_component(1)
+  39: res: p_dc_component(1)
+  40: res: r_component(2)
+  41: res: p_dc_component(2)
+  42: res: r_component(3)
+  43: res: p_dc_component(3)

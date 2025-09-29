@@ -1,0 +1,10 @@
+! ----- names for bodies -----
+$ Conductor1 = 1
+$ Conductor2 = 2
+$ Conductor3 = 3
+$ Insulation = 4
+$ Sheath = 5
+$ Core jacket = 6
+$ Air = 7
+! ----- names for boundaries -----
+$ Boundary = 1

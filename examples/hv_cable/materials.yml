@@ -1,0 +1,24 @@
+Air:
+  Electric Conductivity: 0.0
+  Relative Permittivity: 1
+  Relative Permeability: 1
+
+Aluminium:
+  Electric Conductivity: 3.69e7
+  Relative Permittivity: 1
+  Relative Permeability: 1
+
+Copper:
+  Electric Conductivity: 5.85e7
+  Relative Permittivity: 1
+  Relative Permeability: 1
+
+XLPE:
+  Electric Conductivity: 0.0
+  Relative Permittivity: 2.3
+  Relative Permeability: 1
+
+HDPE:
+  Electric Conductivity: 0.0
+  Relative Permittivity: 2.3
+  Relative Permeability: 1
