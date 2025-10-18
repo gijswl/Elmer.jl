@@ -1,10 +1,5 @@
 import Base: write
 
-using OrderedCollections
-using PhysicalConstants.CODATA2022
-using Printf
-using Unitful
-
 abstract type CoordinateSystem end;
 struct CoordinateCartesian <: CoordinateSystem end
 struct CoordinateAxi <: CoordinateSystem end
@@ -100,6 +95,7 @@ mutable struct SolverInformationFile
 
     simulation::Simulation
     constants::Dict
+    includes::Vector{String}
 
     equations::Vector{Equation}
     solvers::Vector{Solver}
@@ -111,7 +107,7 @@ mutable struct SolverInformationFile
     components::Vector{Component}
 
     function SolverInformationFile(filename::String, simulation::Simulation; data_path::String="simdata/", result_dir::String="results", mesh_db::String=".")
-        return new(filename * ".sif", data_path, result_dir, mesh_db, simulation, get_default_constants(), Equation[], Solver[], Material[], Body[], BodyForce[], InitialCondition[], BoundaryCondition[], Component[])
+        return new(filename * ".sif", data_path, result_dir, mesh_db, simulation, get_default_constants(), String[], Equation[], Solver[], Material[], Body[], BodyForce[], InitialCondition[], BoundaryCondition[], Component[])
     end
 end
 
@@ -148,6 +144,10 @@ format_value(value::SimulationScanning) = "Scanning"
 
 function add_constant!(sif::SolverInformationFile, name::String, value)
     sif.constants[name] = value
+end
+
+function add_include!(sif::SolverInformationFile, file::String)
+    push!(sif.includes, file)
 end
 
 function add_solver!(sif::SolverInformationFile, name::String, exec::ExecSolver; data::OrderedDict=OrderedDict())
@@ -303,6 +303,13 @@ function write_constants(io::IOStream, sif::SolverInformationFile)
     Base.write(io, "End\n\n")
 end
 
+function write_includes(io::IOStream, sif::SolverInformationFile)
+    for include ∈ sif.includes
+        Base.write(io, "Include \"$include\"")
+    end
+    Base.write(io, "\n\n")
+end
+
 function write_equations(io::IOStream, sif::SolverInformationFile)
     for equation ∈ sif.equations
         solver_names = [sif.solvers[s].name for s ∈ equation.solvers]
@@ -434,6 +441,7 @@ function write(sif::SolverInformationFile)
 
     open(joinpath(sif.data_path, sif.filename), "w") do file
         write_header(file, sif)
+        write_includes(file, sif)
 
         Base.write(file, "!---------------------------------------------------------\n")
         Base.write(file, "! Simulation setup\n")

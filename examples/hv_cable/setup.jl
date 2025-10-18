@@ -1,14 +1,16 @@
 using Elmer
 using OrderedCollections
+using PyCall
+
+cb = pyimport("elmer_circuitbuilder")
 
 data_path = joinpath(@__DIR__, "simdata\\")
 solvers_db = joinpath(@__DIR__, "solvers.yml")
 materials_db = joinpath(@__DIR__, "materials.yml")
+circuit_file = "circuit.definition"
 
 frequency = 50
-Icond1 = 1000 * exp(0π / 3 * 1im)
-Icond2 = 1000 * exp(2π / 3 * 1im)
-Icond3 = 1000 * exp(-2π / 3 * 1im)
+Icond = 1000
 
 # Electromagnetic simulation
 sim_em = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(), 1e-3, OrderedDict(
@@ -64,6 +66,21 @@ body_jacket = add_body!(sif_em, "Jacket", [6]; equation=eq, material=mat_HDPE)
 body_air = add_body!(sif_em, "Air", [7]; equation=eq, material=mat_air)
 
 bc_inf = add_boundary_condition!(sif_em, "Inf", [1]; data=OrderedDict("Infinity BC" => true))
+
+# Circuit definition
+c = cb.number_of_circuits(1)
+
+c[1].ref_node = 1
+I1 = cb.I("I1", 1, 2, Icond * exp(+0π / 3 * 1im))
+I2 = cb.I("I2", 1, 3, Icond * exp(+2π / 3 * 1im))
+I3 = cb.I("I3", 1, 4, Icond * exp(-2π / 3 * 1im))
+cond1 = cb.ElmerComponent("T1", 1, 2, 1, [PyObject(body_conductor1)])
+cond2 = cb.ElmerComponent("T2", 1, 3, 2, [PyObject(body_conductor2)])
+cond3 = cb.ElmerComponent("T3", 1, 4, 3, [PyObject(body_conductor3)])
+c[1].components = [[I1, I2, I3, cond1, cond2, cond3]]
+
+cb.generate_elmer_circuits(c, joinpath(data_path, circuit_file))
+add_include!(sif_em, circuit_file)
 
 Elmer.write(sif_em)
 

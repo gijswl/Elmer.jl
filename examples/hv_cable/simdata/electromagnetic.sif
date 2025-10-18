@@ -4,6 +4,8 @@ Header
   Results Directory "results"
 End
 
+Include "circuit.definition"
+
 !---------------------------------------------------------
 ! Simulation setup
 !---------------------------------------------------------
