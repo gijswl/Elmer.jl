@@ -51,3 +51,22 @@ ResultOutput:
 SaveScalars:
   Procedure: '"SaveData" "SaveScalars"'
   Filename: scalars.dat
+
+HeatSolver:
+  Procedure: '"HeatSolve" "HeatSolver"'
+  Variable: Temperature
+  Stabilize: True
+  Optimize Bandwidth: True
+
+  Steady State Convergence Tolerance: 1e-06
+  Linear System Solver: Iterative
+  Linear System Symmetric: True
+  Linear System Robust: True
+  Linear System Iterative Method: bicgstab
+  Linear System Convergence Tolerance: 1e-08
+  Linear System Abort Not Converged: False
+  Linear System Preconditioning: ILU0
+  Linear System ILUT Tolerance: 1.0e-3
+  Linear System Preconditioning Recompute: True
+  Linear System Max Iterations: 500
+  Linear System Residual Output: 10

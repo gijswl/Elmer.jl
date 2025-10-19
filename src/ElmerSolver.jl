@@ -111,6 +111,19 @@ mutable struct SolverInformationFile
     end
 end
 
+function Base.show(io::IO, ::MIME"text/plain", sif::SolverInformationFile)
+    println(io, "Solver Information File: $(sif.filename)")
+    println(io, "  $(length(sif.constants)) constants")
+    println(io, "  $(length(sif.equations)) equations")
+    println(io, "  $(length(sif.solvers)) solvers")
+    println(io, "  $(length(sif.materials)) materials")
+    println(io, "  $(length(sif.bodies)) bodies")
+    println(io, "  $(length(sif.body_forces)) body forces")
+    println(io, "  $(length(sif.initial_conditions)) initial conditions")
+    println(io, "  $(length(sif.boundary_conditions)) boundary conditions")
+    println(io, "  $(length(sif.components)) components")
+end
+
 include("Database.jl")
 
 format_property(name::String, value::String) = name * " = " * value
@@ -321,6 +334,8 @@ function write_constants(io::IOStream, sif::SolverInformationFile)
 end
 
 function write_includes(io::IOStream, sif::SolverInformationFile)
+    length(sif.includes) == 0 && return
+
     for include ∈ sif.includes
         Base.write(io, "Include \"$include\"")
     end
