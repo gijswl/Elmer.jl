@@ -142,6 +142,17 @@ format_value(value::SimulationSteady) = "Steady"
 format_value(value::SimulationTransient) = "Transient"
 format_value(value::SimulationScanning) = "Scanning"
 
+format_frequency(frequency::Real) = OrderedDict(
+    "Timestep Intervals" => 1,
+    "Frequency" => frequency
+)
+
+format_frequency(frequency::Vector{<:Real}) = OrderedDict(
+    "Timestep Intervals" => length(frequency),
+    "\$ f" => join(frequency, " "),
+    "Frequency" => "Variable timestep; Real MATC \"f(tx-1)\""
+)
+
 function add_constant!(sif::SolverInformationFile, name::String, value)
     sif.constants[name] = value
 end
@@ -211,6 +222,12 @@ function add_component!(sif::SolverInformationFile, name::String; master_bodies:
     component = Component(id, name, master_bodies, master_boundaries, data)
     push!(sif.components, component)
     return id
+end
+
+function update_simulation_data!(sim::Simulation, data::OrderedDict)
+    for (key, val) ∈ data
+        sim.data[key] = val
+    end
 end
 
 function update_solver_data!(sif::SolverInformationFile, solver_id::Int, data::OrderedDict)

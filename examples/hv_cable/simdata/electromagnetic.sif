@@ -12,11 +12,11 @@ Include "circuit.definition"
 Simulation
   Max Output Level = 7
   Coordinate System = Cartesian
-  Simulation Type = Steady
+  Simulation Type = Scanning
   Coordinate Scaling = 0.001
-  Timestep Intervals = 1
   Output Intervals = 1
   Steady State Max Iterations = 1
+  Timestep Intervals = 1
   Frequency = 50
 End
 

@@ -5,13 +5,11 @@ using OrderedCollections
 frequency = [50, 100, 200]
 
 # Set up simulation
-simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(), 1, OrderedDict(
-    "Timestep Intervals" => length(frequency),
+simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(), 1, OrderedDict{String,Any}(
     "Output Intervals" => 1,
-    "Steady State Max Iterations" => 1,
-    "\$ f" => join(frequency, " "),
-    "Frequency" => "Variable timestep; Real MATC \"f(tx-1)\""
+    "Steady State Max Iterations" => 1
 ))
+update_simulation_data!(simulation, Elmer.format_frequency(frequency))
 
 data_path = joinpath(@__DIR__, "simdata\\")
 solvers_db = joinpath(@__DIR__, "solvers.yml")
@@ -52,7 +50,8 @@ component = add_component!(sif, "Coil", master_bodies=[body_coil], data=OrderedD
 
 # Write SIF & run
 Elmer.write(sif)
-Elmer.write_startinfo(sif)
 
 # Elmer.elmergrid_gmsh(sif.data_path, "team7.msh")
 Elmer.run_elmer_solver(sif)
+
+dat_em = load_dat(joinpath(data_path, "results", "scalars.dat"))

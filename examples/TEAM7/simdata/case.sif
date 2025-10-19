@@ -4,6 +4,8 @@ Header
   Results Directory "results"
 End
 
+
+
 !---------------------------------------------------------
 ! Simulation setup
 !---------------------------------------------------------
@@ -11,9 +13,9 @@ Simulation
   Max Output Level = 7
   Coordinate System = Cartesian
   Simulation Type = Scanning
-  Timestep Intervals = 3
   Output Intervals = 1
   Steady State Max Iterations = 1
+  Timestep Intervals = 3
   $ f = 50 100 200
   Frequency = Variable timestep; Real MATC "f(tx-1)"
 End
@@ -83,7 +85,7 @@ Solver 2
   Linear System Convergence Tolerance = 1.0e-8
   Linear System Abort Not Converged = Logical False
   Linear System Preconditioning = none
-  Linear System Max Iterations = 400
+  Linear System Max Iterations = 3000
   Linear System Residual Output = 10
   BicgstabL polynomial degree = 4
   Linear System Nullify Guess = Logical True
