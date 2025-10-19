@@ -57,11 +57,11 @@ mat_Cu = load_material!(sif_em, "Copper", materials_db)
 mat_XLPE = load_material!(sif_em, "XLPE", materials_db)
 mat_HDPE = load_material!(sif_em, "HDPE", materials_db)
 
-body_conductor1 = add_body!(sif_em, "Conductor1", [1]; equation=eq, material=mat_Al, mask = ["Conductor1"])
-body_conductor2 = add_body!(sif_em, "Conductor2", [2]; equation=eq, material=mat_Al, mask = ["Conductor2"])
-body_conductor3 = add_body!(sif_em, "Conductor3", [3]; equation=eq, material=mat_Al, mask = ["Conductor3"])
+body_conductor1 = add_body!(sif_em, "Conductor1", [1]; equation=eq, material=mat_Al, mask=["Conductor1"])
+body_conductor2 = add_body!(sif_em, "Conductor2", [2]; equation=eq, material=mat_Al, mask=["Conductor2"])
+body_conductor3 = add_body!(sif_em, "Conductor3", [3]; equation=eq, material=mat_Al, mask=["Conductor3"])
 body_insulation = add_body!(sif_em, "Insulation", [4]; equation=eq, material=mat_XLPE)
-body_sheath = add_body!(sif_em, "Sheath", [5]; equation=eq, material=mat_Cu, mask = ["Sheath"])
+body_sheath = add_body!(sif_em, "Sheath", [5]; equation=eq, material=mat_Cu, mask=["Sheath"])
 body_jacket = add_body!(sif_em, "Jacket", [6]; equation=eq, material=mat_HDPE)
 body_air = add_body!(sif_em, "Air", [7]; equation=eq, material=mat_air)
 
@@ -85,6 +85,13 @@ add_include!(sif_em, circuit_file)
 Elmer.write(sif_em)
 
 # Elmer.elmergrid_gmsh(sif_em.data_path, "electromagnetic.msh")
-# Elmer.run_elmer_solver(sif_em)
+Elmer.run_elmer_solver(sif_em)
 
-# TODO read loss from .dat
+dat_em = load_dat(joinpath(data_path, "results", "electromagnetic.dat"))
+Pj_cond1 = dat_em[1, "body int: joule heating e mask conductor1"]
+Pj_cond2 = dat_em[1, "body int: joule heating e mask conductor2"]
+Pj_cond3 = dat_em[1, "body int: joule heating e mask conductor3"]
+Pj_sheath = dat_em[1, "body int: joule heating e mask sheath"]
+Peddy = dat_em[1, "res: eddy current power"]
+
+@assert Pj_cond1 + Pj_cond2 + Pj_cond3 + Pj_sheath ≈ Peddy "Total eddy current losses should be equal to the sum of the defined joule heating body integrals"

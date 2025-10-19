@@ -13,4 +13,7 @@ export load_solver!, load_material!
 include("ElmerSolver.jl")
 include("ElmerGrid.jl")
 
+export load_dat
+include("PostProcessing.jl")
+
 end # module Elmer
