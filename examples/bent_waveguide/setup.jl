@@ -16,14 +16,19 @@ kc = π / a
 β0 = √(k0^2 - kc^2)
 
 # Set up simulation
-simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(), 1, OrderedDict("Frequency" => f))
-sif = SolverInformationFile("case", simulation, data_path="examples/bent_waveguide/simdata/", mesh_db="bent_waveguide")
+data_path = joinpath(@__DIR__, "simdata\\")
+solvers_db = joinpath(@__DIR__, "solvers.yml")
 
-solver_helmholtz = load_solver!(sif, "VectorHelmholtzSolver", Elmer.ExecAlways(), "examples/bent_waveguide/solvers.yml")
+simulation = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady())
+update_simulation_data!(simulation, Elmer.format_frequency(f))
+
+sif = SolverInformationFile("case", simulation, data_path=data_path, mesh_db="bent_waveguide")
+
+solver_helmholtz = load_solver!(sif, "VectorHelmholtzSolver", Elmer.ExecAlways(), solvers_db)
 update_solver_data!(sif, solver_helmholtz, "Linear System Preconditioning", "ILUT")
 update_solver_data!(sif, solver_helmholtz, "Quadratic Approximation", true)
-post_helmholtz = load_solver!(sif, "VectorHelmholtzPost", Elmer.ExecAlways(), "examples/bent_waveguide/solvers.yml")
-solver_result = load_solver!(sif, "ResultOutputSolver", Elmer.ExecAfterStep(), "examples/bent_waveguide/solvers.yml")
+post_helmholtz = load_solver!(sif, "VectorHelmholtzPost", Elmer.ExecAlways(), solvers_db)
+solver_result = load_solver!(sif, "ResultOutputSolver", Elmer.ExecAfterStep(), solvers_db)
 
 eqn = add_equation!(sif, "main", [solver_helmholtz, post_helmholtz, solver_result])
 
@@ -40,7 +45,6 @@ bnd_out = add_boundary_condition!(sif, "Port out", [2]; data=OrderedDict("Electr
 
 # Write SIF & run
 Elmer.write(sif)
-Elmer.write_startinfo(sif)
 
 Elmer.elmergrid_gmsh(sif.data_path, "bent_waveguide.msh")
-Elmer.run_elmer_solver(sif)
+Elmer.elmer_solver(sif)

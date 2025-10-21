@@ -1,23 +1,73 @@
 import Base: write
 
+"""
+    abstract type CoordinateSystem
+
+Represents the `Coordinate System` entry in the SIF.
+Valid values are represented by 
+ - [`CoordinateAxi`](@ref), 
+ - [`CoordinateCartesian`](@ref),
+ - [`CoordinateCylindric`](@ref).
+"""
 abstract type CoordinateSystem end;
-struct CoordinateCartesian <: CoordinateSystem end
 struct CoordinateAxi <: CoordinateSystem end
+struct CoordinateCartesian <: CoordinateSystem end
 struct CoordinateCylindric <: CoordinateSystem end
 
+"""
+    abstract type SimulationType
+
+Represents the `Simulation Type` entry in the SIF.
+Valid values are represented by 
+ - [`SimulationScanning`](@ref), 
+ - [`SimulationSteady`](@ref), 
+ - [`SimulationTransient`](@ref).
+"""
 abstract type SimulationType end;
+struct SimulationScanning <: SimulationType end
 struct SimulationSteady <: SimulationType end
 struct SimulationTransient <: SimulationType end
-struct SimulationScanning <: SimulationType end
 
+"""
+    mutable struct Simulation
+
+Stores the information of the `Simulation` block in the SIF. The required fields are
+ - `output_level` an integer between 0 and 10 defining the logging verbosity,
+ - `coordinate_system` ([`CoordinateSystem`](@ref)),
+ - `simulation_type` ([`SimulationType`](@ref)).
+
+Optionally, 
+ - `coordinate_scaling` if spatial units are not meters,
+ - `data`, an `OrderedDict` of arbitrary data. 
+"""
 mutable struct Simulation
     output_level::Int
     coordinate_system::CoordinateSystem
     simulation_type::SimulationType
     coordinate_scaling::Real
     data::OrderedDict
+
+    function Simulation(output_level::Int, coordinate_system::CoordinateSystem, simulation_type::SimulationType; coordinate_scale=1.0, data=OrderedDict{String,Any}())
+        new(output_level, coordinate_system, simulation_type, coordinate_scale, data)
+    end
 end
 
+"""
+    abstract type ExecSolver
+
+Represents the `Exec Solver` entry in the SIF.
+Valid values are represented by 
+ - [`ExecAlways`](@ref), 
+ - [`ExecBeforeAll`](@ref), 
+ - [`ExecAfterAll`](@ref),
+ - [`ExecBeforeSim`](@ref),
+ - [`ExecAfterSim`](@ref),
+ - [`ExecBeforeStep`](@ref),
+ - [`ExecAfterStep`](@ref),
+ - [`ExecBeforeSave`](@ref),
+ - [`ExecAfterSave`](@ref),
+ - [`ExecNever`](@ref).
+"""
 abstract type ExecSolver end
 struct ExecAlways <: ExecSolver end
 struct ExecBeforeAll <: ExecSolver end
@@ -30,6 +80,12 @@ struct ExecBeforeSave <: ExecSolver end
 struct ExecAfterSave <: ExecSolver end
 struct ExecNever <: ExecSolver end
 
+"""
+    mutable struct Solver
+
+Stores the information of a `Solver` block in the SIF.
+It must be instantiated using [`add_solver!`](@ref).
+"""
 mutable struct Solver
     id::Int
     name::String
@@ -37,18 +93,36 @@ mutable struct Solver
     data::OrderedDict
 end
 
+"""
+    mutable struct Equation
+
+Stores the information of a `Equation` block in the SIF.
+It must be instantiated using [`add_equation!`](@ref).
+"""
 mutable struct Equation
     id::Int
     name::String
     solvers::Vector{Int}
 end
 
+"""
+    mutable struct Material
+
+Stores the information of a `Material` block in the SIF.
+It must be instantiated using [`add_material!`](@ref).
+"""
 mutable struct Material
     id::Int
     name::String
     data::OrderedDict
 end
 
+"""
+    mutable struct Body
+
+Stores the information of a `Body` block in the SIF.
+It must be instantiated using [`add_body!`](@ref).
+"""
 mutable struct Body
     id::Int
     name::String
@@ -60,18 +134,36 @@ mutable struct Body
     data::OrderedDict
 end
 
+"""
+    mutable struct BodyForce
+
+Stores the information of a `Body Force` block in the SIF.
+It must be instantiated using [`add_body_force!`](@ref).
+"""
 mutable struct BodyForce
     id::Int
     name::String
     data::OrderedDict
 end
 
+"""
+    mutable struct InitialCondition
+
+Stores the information of a `Initial Condition` block in the SIF.
+It must be instantiated using [`add_initial_condition!`](@ref).
+"""
 mutable struct InitialCondition
     id::Int
     name::String
     data::OrderedDict
 end
 
+"""
+    mutable struct BoundaryCondition
+
+Stores the information of a `Boundary Condition` block in the SIF.
+It must be instantiated using [`add_boundary_condition!`](@ref).
+"""
 mutable struct BoundaryCondition
     id::Int
     name::String
@@ -79,6 +171,12 @@ mutable struct BoundaryCondition
     data::OrderedDict
 end
 
+"""
+    mutable struct Component
+
+Stores the information of a `Component` block in the SIF.
+It must be instantiated using [`add_component!`](@ref).
+"""
 mutable struct Component
     id::Int
     name::String
@@ -87,6 +185,12 @@ mutable struct Component
     data::OrderedDict
 end
 
+"""
+    mutable struct SolverInformationFile
+    SolverInformationFile(filename::String, simulation::Simulation; data_path::String="simdata/", result_dir::String="results", mesh_db::String=".")
+
+Stores the entire solver information file (SIF). The different parts are added to the SIF using the `add_*!` functions.
+"""
 mutable struct SolverInformationFile
     filename::String
     data_path::String
@@ -126,11 +230,31 @@ end
 
 include("Database.jl")
 
+"""
+    format_property(name::String, value::String)
+    format_property(name::String, value::Any)
+
+Formats the (name, value) pair for writing to the SIF. 
+If `value` is not a string, [`format_value`](@ref) is used to convert it.
+"""
 format_property(name::String, value::String) = name * " = " * value
-format_property(name::String, len::Int, value::String) = name * "(" * string(len) * ") = " * value
 format_property(name::String, value::Any) = format_property(name, format_value(value))
+
+"""
+    format_property(name::String, len::Int, value::String)
+    format_property(name::String, value::Vector)
+
+Formats a vector/list property of length `len`. 
+If the entries of `value` are not strings, [`format_value`](@ref) is used to convert them.
+"""
+format_property(name::String, len::Int, value::String) = name * "(" * string(len) * ") = " * value
 format_property(name::String, value::Vector) = format_property(name, length(value), format_value(value))
 
+"""
+    format_value(value)
+
+Convert value to a SIF-compatible string interpretation.
+"""
 format_value(value::String) = value
 format_value(value::Real) = string(value)
 format_value(value::Bool) = value ? "Logical True" : "Logical False"
@@ -155,6 +279,13 @@ format_value(value::SimulationSteady) = "Steady"
 format_value(value::SimulationTransient) = "Transient"
 format_value(value::SimulationScanning) = "Scanning"
 
+"""
+    format_frequency(frequency::Real)
+    format_frequency(frequency::Vector{<:Real})
+
+Format frequency for the Simulation block. 
+A vector of frequencies can be used with the Scanning simulation type.
+"""
 format_frequency(frequency::Real) = OrderedDict(
     "Timestep Intervals" => 1,
     "Frequency" => frequency
@@ -166,14 +297,29 @@ format_frequency(frequency::Vector{<:Real}) = OrderedDict(
     "Frequency" => "Variable timestep; Real MATC \"f(tx-1)\""
 )
 
+"""
+    add_constant!(sif, name, value)
+
+Add a constant to the `Constants` section of the SIF.
+"""
 function add_constant!(sif::SolverInformationFile, name::String, value)
     sif.constants[name] = value
 end
 
+"""
+    add_include!(sif, file)
+
+Define a file to be included in the SIF.
+"""
 function add_include!(sif::SolverInformationFile, file::String)
     push!(sif.includes, file)
 end
 
+"""
+    add_solver!(sif, name, exec; data)
+
+Add a solver called `name` with execution priority `exec` to the SIF. Other data is provided via the optional `data` keyword.
+"""
 function add_solver!(sif::SolverInformationFile, name::String, exec::ExecSolver; data::OrderedDict=OrderedDict())
     id = length(sif.solvers) + 1
     solver = Solver(id, name, exec, data)
@@ -181,6 +327,11 @@ function add_solver!(sif::SolverInformationFile, name::String, exec::ExecSolver;
     return id
 end
 
+"""
+    add_equation!(sif, name, solvers)
+
+Add an equation called `name` to the SIF. The active solvers are provided via `solvers`.
+"""
 function add_equation!(sif::SolverInformationFile, name::String, solvers::Vector{Int})
     id = length(sif.equations) + 1
     eq = Equation(id, name, solvers)
@@ -188,6 +339,11 @@ function add_equation!(sif::SolverInformationFile, name::String, solvers::Vector
     return id
 end
 
+"""
+    add_material!(sif, name; data)
+
+Add a material called `name` to the SIF. Other data is provided via the optional `data` keyword.
+"""
 function add_material!(sif::SolverInformationFile, name::String; data::OrderedDict=OrderedDict())
     id = length(sif.materials) + 1
     material = Material(id, name, data)
@@ -195,9 +351,21 @@ function add_material!(sif::SolverInformationFile, name::String; data::OrderedDi
     return id
 end
 
+"""
+    add_body!(sif, name, target_bodies; equation, material, body_force, initial_condition, mask, data)
+
+Add a body called `name` to the SIF, corresponding to the physical bodies `target_bodies`. Optionally defined keywords:
+ - `equation`, the active equation on the body.
+ - `material`, the material of the body.
+ - `body_force`, the body force associated with the body.
+ - `initial_condition`, the initial condition on the body.
+ - `mask`, a property that can be used to select a body or set of bodies in post-processing.
+ - `data`, any other properties defined on the body.
+"""
 function add_body!(sif::SolverInformationFile, name::String, target_bodies::Vector{Int}=Int[]; equation=missing, material=missing, body_force=missing, initial_condition=missing, mask=missing, data::OrderedDict=OrderedDict())
     id = length(sif.bodies) + 1
 
+    # If one or more masks are defined, set the corresponding properties in `data`
     if (~ismissing(mask))
         for m ∈ mask
             data[m] = true
@@ -209,6 +377,11 @@ function add_body!(sif::SolverInformationFile, name::String, target_bodies::Vect
     return id
 end
 
+"""
+    add_body_force!(sif, name; data)
+
+Add a body force called `name` to the SIF. Other data is provided via the optional `data` keyword.
+"""
 function add_body_force!(sif::SolverInformationFile, name::String; data::OrderedDict=OrderedDict())
     id = length(sif.body_forces) + 1
     body_force = BodyForce(id, name, data)
@@ -216,6 +389,11 @@ function add_body_force!(sif::SolverInformationFile, name::String; data::Ordered
     return id
 end
 
+"""
+    add_initial_condition!(sif, name; data)
+
+Add an initial condition called `name` to the SIF. Other data is provided via the optional `data` keyword.
+"""
 function add_initial_condition!(sif::SolverInformationFile, name::String; data::OrderedDict=OrderedDict())
     id = length(sif.initial_conditions) + 1
     initial_condition = InitialCondition(id, name, data)
@@ -223,6 +401,11 @@ function add_initial_condition!(sif::SolverInformationFile, name::String; data::
     return id
 end
 
+"""
+    add_boundary_condition!(sif, name, target_boundaries; data)
+
+Add a boundary condition called `name` to the SIF, corresponding to the physical boundaries `target_boundaries`. Other data is provided via the optional `data` keyword.
+"""
 function add_boundary_condition!(sif::SolverInformationFile, name::String, target_boundaries::Vector{Int}=Int[]; data::OrderedDict=OrderedDict())
     id = length(sif.boundary_conditions) + 1
     boundary_condition = BoundaryCondition(id, name, target_boundaries, data)
@@ -230,6 +413,11 @@ function add_boundary_condition!(sif::SolverInformationFile, name::String, targe
     return id
 end
 
+"""
+    add_component!(sif, name, master_bodies, master_boundaries; data)
+
+Add a component called `name` to the SIF, corresponding to the bodies `master_bodies` or boundaries `master_boundaries`. Other data is provided via the optional `data` keyword.
+"""
 function add_component!(sif::SolverInformationFile, name::String; master_bodies::Vector{Int}=Int[], master_boundaries::Vector{Int}=Int[], data::OrderedDict=OrderedDict())
     id = length(sif.components) + 1
     component = Component(id, name, master_bodies, master_boundaries, data)
@@ -368,7 +556,6 @@ end
 
 function write_materials(io::IOStream, sif::SolverInformationFile)
     for material ∈ sif.materials
-        # Base.write(io, "! ", material.name, "\n")
         Base.write(io, "Material ", string(material.id), "\n")
         Base.write(io, "  ", format_property("Name", material.name), "\n")
         for (key, val) ∈ material.data
@@ -380,7 +567,6 @@ end
 
 function write_bodies(io::IOStream, sif::SolverInformationFile)
     for body ∈ sif.bodies
-        # Base.write(io, "! ", body.name, "\n")
         Base.write(io, "Body ", string(body.id), "\n")
         Base.write(io, "  ", format_property("Name", body.name), "\n")
         if (length(body.target_bodies) > 0)
@@ -411,7 +597,6 @@ end
 
 function write_body_forces(io::IOStream, sif::SolverInformationFile)
     for body_force ∈ sif.body_forces
-        # Base.write(io, "! ", body_force.name, "\n")
         Base.write(io, "Body Force ", string(body_force.id), "\n")
         Base.write(io, "  ", format_property("Name", body_force.name), "\n")
         for (key, val) ∈ body_force.data
@@ -423,7 +608,6 @@ end
 
 function write_initial_conditions(io::IOStream, sif::SolverInformationFile)
     for initial_condition ∈ sif.initial_conditions
-        # Base.write(io, "! ", initial_condition.name, "\n")
         Base.write(io, "Initial Condition ", string(initial_condition.id), "\n")
         Base.write(io, "  ", format_property("Name", initial_condition.name), "\n")
         for (key, val) ∈ initial_condition.data
@@ -435,7 +619,6 @@ end
 
 function write_boundary_conditions(io::IOStream, sif::SolverInformationFile)
     for boundary_condition ∈ sif.boundary_conditions
-        # Base.write(io, "! ", boundary_condition.name, "\n")
         Base.write(io, "Boundary Condition ", string(boundary_condition.id), "\n")
         Base.write(io, "  ", format_property("Name", boundary_condition.name), "\n")
         if (length(boundary_condition.target_boundaries) > 0)
@@ -450,7 +633,6 @@ end
 
 function write_components(io::IOStream, sif::SolverInformationFile)
     for component ∈ sif.components
-        # Base.write(io, "! ", component.name, "\n")
         Base.write(io, "Component ", string(component.id), "\n")
         Base.write(io, "  ", format_property("Name", component.name), "\n")
         if (length(component.master_bodies) > 0)
@@ -468,6 +650,12 @@ function write_components(io::IOStream, sif::SolverInformationFile)
     end
 end
 
+"""
+    write(sif)
+
+Write the information stored in `sif` to the formatted SIF file on the path `sif.data_path`/`sif.filename`.
+If the `data_path` does not exist, it is created.
+"""
 function write(sif::SolverInformationFile)
     ~isdir(sif.data_path) && mkdir(sif.data_path)
 
@@ -511,6 +699,11 @@ function write(sif::SolverInformationFile)
     end
 end
 
+"""
+    write_startinfo(sif)
+
+Creates an `ELMERSOLVER_STARTINFO`` file containing the filename of the `sif`.
+"""
 function write_startinfo(sif::SolverInformationFile)
     @assert isdir(sif.data_path) "STARTINFO can only be written after generating the SIF"
 
@@ -519,20 +712,33 @@ function write_startinfo(sif::SolverInformationFile)
     end
 end
 
-function run_elmer_solver(sim_dir::String; solver_path="ElmerSolver", log_file="elmersolver.log")
+"""
+    elmer_solver(sif; solver_path, log_file)
+    elmer_solver(sim_dir; solver_path, log_file)
+
+Run ElmerSolver (on the `solver_path`) either from the definition of the `sif` or relying on `ELMERSOLVER_STARTINFO` in directory `sim_dir`.
+The `stdout` logging is piped to the `log_file`.
+"""
+function elmer_solver(sim_dir::String; solver_path="ElmerSolver", log_file="elmersolver.log")
     logfile = joinpath(sim_dir, log_file)
     cmd = Cmd(`$solver_path`, dir=sim_dir)
     pipe = pipeline(cmd, stdout=logfile)
     run(pipe)
 end
 
-function run_elmer_solver(sif::SolverInformationFile; solver_path="ElmerSolver", log_file="elmersolver.log")
+function elmer_solver(sif::SolverInformationFile; solver_path="ElmerSolver", log_file="elmersolver.log")
     logfile = joinpath(sif.data_path, log_file)
     cmd = Cmd(`$solver_path $(sif.filename)`, dir=sif.data_path)
     pipe = pipeline(cmd, stdout=logfile)
     run(pipe)
 end
 
+"""
+    get_default_constants()
+
+Return a dictionary with a default set of constants to include in the SIF.
+The constants are obtained from `PhysicalConstants.jl`.
+"""
 function get_default_constants()
     return Dict(
         "Permittivity of Vacuum" => ustrip(VacuumElectricPermittivity),

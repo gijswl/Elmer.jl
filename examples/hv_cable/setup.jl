@@ -19,7 +19,7 @@ Set up the electromagnetic part of the model
 function setup_em(frequency::F, Icond::Real; sim_name::String="electromagnetic", circuit_file::String="circuit.definition") where {F<:Union{Real,Vector{<:Real}}}
     # Simulation parameters
     coord_scaling = 1e-3
-    sim_em = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(), coord_scaling, OrderedDict{String,Any}(
+    sim_em = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(); coordinate_scale=coord_scaling, data=OrderedDict{String,Any}(
         "Output Intervals" => 1,
         "Steady State Max Iterations" => 1
     ))
@@ -100,7 +100,7 @@ end
 
 function setup_thermal(loss::Dict; sim_name::String="thermal")
     coord_scaling = 1e-3
-    sim_thermal = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(), coord_scaling, OrderedDict{String,Any}(
+    sim_thermal = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(); coordinate_scale=coord_scaling, data=OrderedDict{String,Any}(
         "Output Intervals" => 1,
         "Steady State Max Iterations" => 1
     ))
@@ -110,7 +110,7 @@ function setup_thermal(loss::Dict; sim_name::String="thermal")
     # Solvers
     solver_thermal = load_solver!(sif_thermal, "HeatSolver", Elmer.ExecAlways(), solvers_db)
     save_result = load_solver!(sif_thermal, "ResultOutput", Elmer.ExecAfterStep(), solvers_db)
-    
+
     update_solver_data!(sif_thermal, save_result, "Output File Name", sim_name)
 
     # Equations
@@ -124,18 +124,18 @@ function setup_thermal(loss::Dict; sim_name::String="thermal")
     mat_HDPE = load_material!(sif_thermal, "HDPE", materials_db)
 
     # Body forces
-    bf_conductor1 = add_body_force!(sif_thermal, "Conductor1"; data = OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor1"]))
-    bf_conductor2 = add_body_force!(sif_thermal, "Conductor2"; data = OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor2"]))
-    bf_conductor3 = add_body_force!(sif_thermal, "Conductor3"; data = OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor3"]))
-    bf_sheath = add_body_force!(sif_thermal, "Sheath"; data = OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Sheath"]))
-    bf_dielectric = add_body_force!(sif_thermal, "Dielectric"; data = OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Dielectric"]))
+    bf_conductor1 = add_body_force!(sif_thermal, "Conductor1"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor1"]))
+    bf_conductor2 = add_body_force!(sif_thermal, "Conductor2"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor2"]))
+    bf_conductor3 = add_body_force!(sif_thermal, "Conductor3"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor3"]))
+    bf_sheath = add_body_force!(sif_thermal, "Sheath"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Sheath"]))
+    bf_dielectric = add_body_force!(sif_thermal, "Dielectric"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Dielectric"]))
 
     # Bodies
-    body_conductor1 = add_body!(sif_thermal, "Conductor1", [1]; equation=eq, material=mat_Al, body_force = bf_conductor1)
-    body_conductor2 = add_body!(sif_thermal, "Conductor2", [2]; equation=eq, material=mat_Al, body_force = bf_conductor2)
-    body_conductor3 = add_body!(sif_thermal, "Conductor3", [3]; equation=eq, material=mat_Al, body_force = bf_conductor3)
-    body_insulation = add_body!(sif_thermal, "Insulation", [4]; equation=eq, material=mat_XLPE, body_force = bf_dielectric)
-    body_sheath = add_body!(sif_thermal, "Sheath", [5]; equation=eq, material=mat_Cu, body_force = bf_sheath)
+    body_conductor1 = add_body!(sif_thermal, "Conductor1", [1]; equation=eq, material=mat_Al, body_force=bf_conductor1)
+    body_conductor2 = add_body!(sif_thermal, "Conductor2", [2]; equation=eq, material=mat_Al, body_force=bf_conductor2)
+    body_conductor3 = add_body!(sif_thermal, "Conductor3", [3]; equation=eq, material=mat_Al, body_force=bf_conductor3)
+    body_insulation = add_body!(sif_thermal, "Insulation", [4]; equation=eq, material=mat_XLPE, body_force=bf_dielectric)
+    body_sheath = add_body!(sif_thermal, "Sheath", [5]; equation=eq, material=mat_Cu, body_force=bf_sheath)
     body_jacket = add_body!(sif_thermal, "Jacket", [6]; equation=eq, material=mat_HDPE)
     body_air = add_body!(sif_thermal, "Soil", [7]; equation=eq, material=mat_soil)
 
@@ -153,7 +153,7 @@ frequency = 50
 Icond = 515
 
 sif_em = setup_em(frequency, Icond)
-Elmer.run_elmer_solver(sif_em)
+Elmer.elmer_solver(sif_em, log_file="solver_em.log")
 
 dat_em = load_dat(joinpath(data_path, "results", "electromagnetic.dat"))
 Pj_cond1 = dat_em[1, "body int: joule heating e mask conductor1"]
@@ -173,4 +173,4 @@ sif_thermal = setup_thermal(Dict(
     "Sheath" => Pj_sheath,
     "Dielectric" => Pj_diel
 ))
-Elmer.run_elmer_solver(sif_thermal)
+Elmer.elmer_solver(sif_thermal, log_file="solver_thermal.log")

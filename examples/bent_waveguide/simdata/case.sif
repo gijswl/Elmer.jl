@@ -11,6 +11,7 @@ Simulation
   Max Output Level = 7
   Coordinate System = Cartesian
   Simulation Type = Steady
+  Timestep Intervals = 1
   Frequency = 2.5e9
 End
 

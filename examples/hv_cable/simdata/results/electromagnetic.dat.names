@@ -3,7 +3,7 @@ Elmer version: 9.0
 Elmer revision: Release
 Elmer compilation date: 2025-09-04
 Solver input file: electromagnetic.sif
-File started at: 2025/10/19 16:28:05
+File started at: 2025/10/21 17:59:38
  
 Variables in columns of matrix: 
    1: body int: joule heating e mask conductor1
