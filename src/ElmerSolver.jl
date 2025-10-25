@@ -487,6 +487,13 @@ function update_component_data!(sif::SolverInformationFile, component_id::Int, k
     component.data[key] = value
 end
 
+function update_component_data!(sif::SolverInformationFile, component_id::Int, data::OrderedDict)
+    component = sif.components[component_id]
+    for (key, val) ∈ data
+        component.data[key] = val
+    end
+end
+
 function write_header(io::IOStream, sif::SolverInformationFile)
     Base.write(io, "Header\n")
     Base.write(io, "  CHECK KEYWORDS \"Warn\"\n")
