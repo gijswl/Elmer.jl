@@ -33,7 +33,7 @@ solver_result = load_solver!(sif, "ResultOutputSolver", Elmer.ExecAfterStep(), s
 eqn = add_equation!(sif, "main", [solver_helmholtz, post_helmholtz, solver_result])
 
 # Define physical bodies
-mat_air = add_material!(sif, "Air"; data=OrderedDict("Relative Permittivity" => 1, "Relative Permeability" => 1))
+mat_air = add_material!(sif, "Air"; data=OrderedDict("Relative Permittivity" => 1.0, "Relative Permeability" => 1.0))
 
 bdy_wg = add_body!(sif, "Waveguide", [1]; equation=eqn, material=mat_air)
 

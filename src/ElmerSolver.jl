@@ -47,7 +47,7 @@ mutable struct Simulation
     coordinate_scaling::Real
     data::OrderedDict
 
-    function Simulation(output_level::Int, coordinate_system::CoordinateSystem, simulation_type::SimulationType; coordinate_scale=1.0, data=OrderedDict{String,Any}())
+    function Simulation(output_level::Int, coordinate_system::CoordinateSystem, simulation_type::SimulationType; coordinate_scale=1.0, data=OrderedDict{String, Any}())
         new(output_level, coordinate_system, simulation_type, coordinate_scale, data)
     end
 end
@@ -127,10 +127,10 @@ mutable struct Body
     id::Int
     name::String
     target_bodies::Vector{Int}
-    equation::Union{Int,Missing}
-    material::Union{Int,Missing}
-    body_force::Union{Int,Missing}
-    initial_condition::Union{Int,Missing}
+    equation::Union{Int, Missing}
+    material::Union{Int, Missing}
+    body_force::Union{Int, Missing}
+    initial_condition::Union{Int, Missing}
     data::OrderedDict
 end
 
@@ -237,8 +237,15 @@ include("Database.jl")
 Formats the (name, value) pair for writing to the SIF. 
 If `value` is not a string, [`format_value`](@ref) is used to convert it.
 """
-format_property(name::String, value::String) = name * " = " * value
-format_property(name::String, value::Any) = format_property(name, format_value(value))
+function format_property(name::String, type, value::String)
+    if (typeof(type) <: Nothing)
+        return "$name = $value"
+    else
+        return "$name = $type $value"
+    end
+end
+format_property(name::String, value::Any) = format_property(name, format_type(value), format_value(value))
+format_property(name::String, value::String) = "$name = $value"
 
 """
     format_property(name::String, len::Int, value::String)
@@ -247,8 +254,20 @@ format_property(name::String, value::Any) = format_property(name, format_value(v
 Formats a vector/list property of length `len`. 
 If the entries of `value` are not strings, [`format_value`](@ref) is used to convert them.
 """
-format_property(name::String, len::Int, value::String) = name * "(" * string(len) * ") = " * value
-format_property(name::String, value::Vector) = format_property(name, length(value), format_value(value))
+function format_property(name::String, len::Int, type, value::String)
+    if (typeof(type) <: Nothing)
+        return "$name(" * string(len) * ") = $value"
+    else
+        return "$name(" * string(len) * ") = $type $value"
+    end
+end
+format_property(name::String, value::Vector) = format_property(name, length(value), format_type(value), format_value(value))
+
+format_type(value::Any) = nothing
+format_type(value::Real) = "Real"
+format_type(value::Integer) = "Integer"
+format_type(value::Bool) = "Logical"
+format_type(value::Vector) = format_type(value[1])
 
 """
     format_value(value)
@@ -257,7 +276,7 @@ Convert value to a SIF-compatible string interpretation.
 """
 format_value(value::String) = value
 format_value(value::Real) = string(value)
-format_value(value::Bool) = value ? "Logical True" : "Logical False"
+format_value(value::Bool) = value ? "True" : "False"
 format_value(value::Vector) = join(format_value.(value), " ")
 
 format_value(value::ExecAlways) = "Always"
@@ -288,13 +307,13 @@ A vector of frequencies can be used with the Scanning simulation type.
 """
 format_frequency(frequency::Real) = OrderedDict(
     "Timestep Intervals" => 1,
-    "Frequency" => frequency
+    "Frequency" => frequency,
 )
 
 format_frequency(frequency::Vector{<:Real}) = OrderedDict(
     "Timestep Intervals" => length(frequency),
     "\$ f" => join(frequency, " "),
-    "Frequency" => "Variable timestep; Real MATC \"f(tx-1)\""
+    "Frequency" => "Variable timestep; Real MATC \"f(tx-1)\"",
 )
 
 """
@@ -752,6 +771,6 @@ function get_default_constants()
         "Permeability of Vacuum" => ustrip(VacuumMagneticPermeability),
         "Stefan Boltzmann" => ustrip(StefanBoltzmannConstant),
         "Boltzmann Constant" => ustrip(BoltzmannConstant),
-        "Unit Charge" => ustrip(ElementaryCharge)
+        "Unit Charge" => ustrip(ElementaryCharge),
     )
 end

@@ -8,20 +8,20 @@ End
 ! Simulation setup
 !---------------------------------------------------------
 Simulation
-  Max Output Level = 7
+  Max Output Level = Integer 7
   Coordinate System = Cartesian
   Simulation Type = Steady
-  Coordinate Scaling = 0.001
-  Output Intervals = 1
-  Steady State Max Iterations = 1
+  Coordinate Scaling = Real 0.001
+  Output Intervals = Integer 1
+  Steady State Max Iterations = Integer 1
 End
 
 Constants
-  Boltzmann Constant = 1.380649e-23
-  Permeability of Vacuum = 1.25663706127e-6
-  Permittivity of Vacuum = 8.8541878188e-12
-  Stefan Boltzmann = 5.6703744191844294e-8
-  Unit Charge = 1.602176634e-19
+  Boltzmann Constant = Real 1.380649e-23
+  Permeability of Vacuum = Real 1.25663706127e-6
+  Permittivity of Vacuum = Real 8.8541878188e-12
+  Stefan Boltzmann = Real 5.6703744191844294e-8
+  Unit Charge = Real 1.602176634e-19
 End
 
 
@@ -30,7 +30,7 @@ End
 !---------------------------------------------------------
 ! Domain
 Equation 1
-  Active Solvers(2) = 1 2   ! HeatSolver, ResultOutput
+  Active Solvers(2) = Integer 1 2   ! HeatSolver, ResultOutput
 End
 
 ! HeatSolver
@@ -41,18 +41,18 @@ Solver 1
   Variable = Temperature
   Stabilize = Logical True
   Optimize Bandwidth = Logical True
-  Steady State Convergence Tolerance = 1.0e-6
+  Steady State Convergence Tolerance = Real 1.0e-6
   Linear System Solver = Iterative
   Linear System Symmetric = Logical True
   Linear System Robust = Logical True
   Linear System Iterative Method = bicgstab
-  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Convergence Tolerance = Real 1.0e-8
   Linear System Abort Not Converged = Logical False
   Linear System Preconditioning = ILU0
-  Linear System ILUT Tolerance = 0.001
+  Linear System ILUT Tolerance = Real 0.001
   Linear System Preconditioning Recompute = Logical True
-  Linear System Max Iterations = 500
-  Linear System Residual Output = 10
+  Linear System Max Iterations = Integer 500
+  Linear System Residual Output = Integer 10
 End
 
 ! ResultOutput
@@ -73,44 +73,44 @@ End
 !---------------------------------------------------------
 Material 1
   Name = Soil
-  Density = 1400
-  Heat Conductivity = 0.268
+  Density = Real 1400.0
+  Heat Conductivity = Real 0.268
 End
 
 Material 2
   Name = Aluminium
-  Electric Conductivity = 3.69e7
-  Relative Permittivity = 1
-  Relative Permeability = 1
-  Density = 2700
-  Heat Conductivity = 205.0
+  Electric Conductivity = Real 3.69e7
+  Relative Permittivity = Real 1.0
+  Relative Permeability = Real 1.0
+  Density = Real 2700.0
+  Heat Conductivity = Real 205.0
 End
 
 Material 3
   Name = XLPE
-  Electric Conductivity = 0.0
-  Relative Permittivity = 2.3
-  Relative Permeability = 1
-  Density = 930
-  Heat Conductivity = 0.335
+  Electric Conductivity = Real 0.0
+  Relative Permittivity = Real 2.3
+  Relative Permeability = Real 1.0
+  Density = Real 930.0
+  Heat Conductivity = Real 0.335
 End
 
 Material 4
   Name = Copper
-  Electric Conductivity = 5.85e7
-  Relative Permittivity = 1
-  Relative Permeability = 1
-  Density = 8960
-  Heat Conductivity = 390
+  Electric Conductivity = Real 5.85e7
+  Relative Permittivity = Real 1.0
+  Relative Permeability = Real 1.0
+  Density = Real 8960.0
+  Heat Conductivity = Real 390.0
 End
 
 Material 5
   Name = HDPE
-  Electric Conductivity = 0.0
-  Relative Permittivity = 2.3
-  Relative Permeability = 1
-  Density = 930
-  Heat Conductivity = 0.335
+  Electric Conductivity = Real 0.0
+  Relative Permittivity = Real 2.3
+  Relative Permeability = Real 1.0
+  Density = Real 930.0
+  Heat Conductivity = Real 0.335
 End
 
 
@@ -119,97 +119,97 @@ End
 !---------------------------------------------------------
 Body 1
   Name = Conductor1
-  Target Bodies(1) = 1
-  Equation = 1  ! Domain
-  Material = 2  ! Aluminium
-  Body Force = 1  ! Conductor1
+  Target Bodies(1) = Integer 1
+  Equation = Integer 1  ! Domain
+  Material = Integer 2  ! Aluminium
+  Body Force = Integer 1  ! Conductor1
 End
 
 Body 2
   Name = Conductor2
-  Target Bodies(1) = 2
-  Equation = 1  ! Domain
-  Material = 2  ! Aluminium
-  Body Force = 2  ! Conductor2
+  Target Bodies(1) = Integer 2
+  Equation = Integer 1  ! Domain
+  Material = Integer 2  ! Aluminium
+  Body Force = Integer 2  ! Conductor2
 End
 
 Body 3
   Name = Conductor3
-  Target Bodies(1) = 3
-  Equation = 1  ! Domain
-  Material = 2  ! Aluminium
-  Body Force = 3  ! Conductor3
+  Target Bodies(1) = Integer 3
+  Equation = Integer 1  ! Domain
+  Material = Integer 2  ! Aluminium
+  Body Force = Integer 3  ! Conductor3
 End
 
 Body 4
   Name = Insulation
-  Target Bodies(1) = 4
-  Equation = 1  ! Domain
-  Material = 3  ! XLPE
-  Body Force = 5  ! Dielectric
+  Target Bodies(1) = Integer 4
+  Equation = Integer 1  ! Domain
+  Material = Integer 3  ! XLPE
+  Body Force = Integer 5  ! Dielectric
 End
 
 Body 5
   Name = Sheath
-  Target Bodies(1) = 5
-  Equation = 1  ! Domain
-  Material = 4  ! Copper
-  Body Force = 4  ! Sheath
+  Target Bodies(1) = Integer 5
+  Equation = Integer 1  ! Domain
+  Material = Integer 4  ! Copper
+  Body Force = Integer 4  ! Sheath
 End
 
 Body 6
   Name = Jacket
-  Target Bodies(1) = 6
-  Equation = 1  ! Domain
-  Material = 5  ! HDPE
+  Target Bodies(1) = Integer 6
+  Equation = Integer 1  ! Domain
+  Material = Integer 5  ! HDPE
 End
 
 Body 7
   Name = Soil
-  Target Bodies(1) = 7
-  Equation = 1  ! Domain
-  Material = 1  ! Soil
+  Target Bodies(1) = Integer 7
+  Equation = Integer 1  ! Domain
+  Material = Integer 1  ! Soil
 End
 
 Body Force 1
   Name = Conductor1
-  Heat Source = 1
-  Integral Heat Source = 3.645575330429
+  Heat Source = Real 1.0
+  Integral Heat Source = Real 3.645575330429
 End
 
 Body Force 2
   Name = Conductor2
-  Heat Source = 1
-  Integral Heat Source = 3.645363255991
+  Heat Source = Real 1.0
+  Integral Heat Source = Real 3.645363255991
 End
 
 Body Force 3
   Name = Conductor3
-  Heat Source = 1
-  Integral Heat Source = 3.64561054859
+  Heat Source = Real 1.0
+  Integral Heat Source = Real 3.64561054859
 End
 
 Body Force 4
   Name = Sheath
-  Heat Source = 1
-  Integral Heat Source = 10.25163405879
+  Heat Source = Real 1.0
+  Integral Heat Source = Real 10.25163405879
 End
 
 Body Force 5
   Name = Dielectric
-  Heat Source = 1
-  Integral Heat Source = 0.384
+  Heat Source = Real 1.0
+  Integral Heat Source = Real 0.384
 End
 
 Boundary Condition 1
   Name = Surface
-  Target Boundaries(1) = 1
-  Temperature = 40
+  Target Boundaries(1) = Integer 1
+  Temperature = Real 40.0
 End
 
 Boundary Condition 2
   Name = Inf
-  Target Boundaries(1) = 2
+  Target Boundaries(1) = Integer 2
   Infinity BC Temp = Logical True
 End
 

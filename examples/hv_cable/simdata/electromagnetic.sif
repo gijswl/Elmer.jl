@@ -10,22 +10,22 @@ Include "circuit.definition"
 ! Simulation setup
 !---------------------------------------------------------
 Simulation
-  Max Output Level = 7
+  Max Output Level = Integer 7
   Coordinate System = Cartesian
   Simulation Type = Scanning
-  Coordinate Scaling = 0.001
-  Output Intervals = 1
-  Steady State Max Iterations = 1
-  Timestep Intervals = 1
-  Frequency = 50
+  Coordinate Scaling = Real 0.001
+  Output Intervals = Integer 1
+  Steady State Max Iterations = Integer 1
+  Timestep Intervals = Integer 1
+  Frequency = Real 50.0
 End
 
 Constants
-  Boltzmann Constant = 1.380649e-23
-  Permeability of Vacuum = 1.25663706127e-6
-  Permittivity of Vacuum = 8.8541878188e-12
-  Stefan Boltzmann = 5.6703744191844294e-8
-  Unit Charge = 1.602176634e-19
+  Boltzmann Constant = Real 1.380649e-23
+  Permeability of Vacuum = Real 1.25663706127e-6
+  Permittivity of Vacuum = Real 8.8541878188e-12
+  Stefan Boltzmann = Real 5.6703744191844294e-8
+  Unit Charge = Real 1.602176634e-19
 End
 
 
@@ -34,7 +34,7 @@ End
 !---------------------------------------------------------
 ! Domain
 Equation 1
-  Active Solvers(6) = 1 2 3 4 5 6   ! CircuitSolver, MGDynHarm2D, MGDynPost2D, CircuitPost, ResultOutput, SaveScalars
+  Active Solvers(6) = Integer 1 2 3 4 5 6   ! CircuitSolver, MGDynHarm2D, MGDynPost2D, CircuitPost, ResultOutput, SaveScalars
 End
 
 ! CircuitSolver
@@ -54,18 +54,18 @@ Solver 2
   Stabilize = Logical True
   Optimize Bandwidth = Logical True
   Export Lagrange Multiplier = Logical True
-  Steady State Convergence Tolerance = 1.0e-6
+  Steady State Convergence Tolerance = Real 1.0e-6
   Linear System Solver = Iterative
   Linear System Complex = Logical True
   Linear System Symmetric = Logical True
   Linear System Robust = Logical True
   Linear System Iterative Method = bicgstabl
-  Linear System Convergence Tolerance = 1.0e-8
+  Linear System Convergence Tolerance = Real 1.0e-8
   Linear System Abort Not Converged = Logical False
   Linear System Preconditioning = none
-  Linear System Max Iterations = 1000
-  Linear System Residual Output = 10
-  BicgstabL polynomial degree = 6
+  Linear System Max Iterations = Integer 1000
+  Linear System Residual Output = Integer 10
+  BicgstabL polynomial degree = Integer 6
   Quadratic Approximation = Logical True
 End
 
@@ -78,13 +78,13 @@ Solver 3
   Optimize Bandwidth = Logical True
   Calculate Current Density = Logical True
   Calculate Joule Heating = Logical True
-  Steady State Convergence Tolerance = 1.0e-6
+  Steady State Convergence Tolerance = Real 1.0e-6
   Linear System Solver = Direct
   Linear System Complex = Logical True
   Linear System Symmetric = Logical True
   Linear System Robust = Logical True
   Linear System Direct Method = UMFPACK
-  Linear System Convergence Tolerance = 1.0e-7
+  Linear System Convergence Tolerance = Real 1.0e-7
 End
 
 ! CircuitPost
@@ -132,45 +132,45 @@ End
 !---------------------------------------------------------
 Material 1
   Name = Air
-  Electric Conductivity = 0.0
-  Relative Permittivity = 1
-  Relative Permeability = 1
+  Electric Conductivity = Real 0.0
+  Relative Permittivity = Real 1.0
+  Relative Permeability = Real 1.0
 End
 
 Material 2
   Name = Aluminium
-  Electric Conductivity = 3.69e7
-  Relative Permittivity = 1
-  Relative Permeability = 1
-  Density = 2700
-  Heat Conductivity = 205.0
+  Electric Conductivity = Real 3.69e7
+  Relative Permittivity = Real 1.0
+  Relative Permeability = Real 1.0
+  Density = Real 2700.0
+  Heat Conductivity = Real 205.0
 End
 
 Material 3
   Name = Copper
-  Electric Conductivity = 5.85e7
-  Relative Permittivity = 1
-  Relative Permeability = 1
-  Density = 8960
-  Heat Conductivity = 390
+  Electric Conductivity = Real 5.85e7
+  Relative Permittivity = Real 1.0
+  Relative Permeability = Real 1.0
+  Density = Real 8960.0
+  Heat Conductivity = Real 390.0
 End
 
 Material 4
   Name = XLPE
-  Electric Conductivity = 0.0
-  Relative Permittivity = 2.3
-  Relative Permeability = 1
-  Density = 930
-  Heat Conductivity = 0.335
+  Electric Conductivity = Real 0.0
+  Relative Permittivity = Real 2.3
+  Relative Permeability = Real 1.0
+  Density = Real 930.0
+  Heat Conductivity = Real 0.335
 End
 
 Material 5
   Name = HDPE
-  Electric Conductivity = 0.0
-  Relative Permittivity = 2.3
-  Relative Permeability = 1
-  Density = 930
-  Heat Conductivity = 0.335
+  Electric Conductivity = Real 0.0
+  Relative Permittivity = Real 2.3
+  Relative Permeability = Real 1.0
+  Density = Real 930.0
+  Heat Conductivity = Real 0.335
 End
 
 
@@ -179,60 +179,60 @@ End
 !---------------------------------------------------------
 Body 1
   Name = Conductor1
-  Target Bodies(1) = 1
-  Equation = 1  ! Domain
-  Material = 2  ! Aluminium
+  Target Bodies(1) = Integer 1
+  Equation = Integer 1  ! Domain
+  Material = Integer 2  ! Aluminium
   Conductor1 = Logical True
 End
 
 Body 2
   Name = Conductor2
-  Target Bodies(1) = 2
-  Equation = 1  ! Domain
-  Material = 2  ! Aluminium
+  Target Bodies(1) = Integer 2
+  Equation = Integer 1  ! Domain
+  Material = Integer 2  ! Aluminium
   Conductor2 = Logical True
 End
 
 Body 3
   Name = Conductor3
-  Target Bodies(1) = 3
-  Equation = 1  ! Domain
-  Material = 2  ! Aluminium
+  Target Bodies(1) = Integer 3
+  Equation = Integer 1  ! Domain
+  Material = Integer 2  ! Aluminium
   Conductor3 = Logical True
 End
 
 Body 4
   Name = Insulation
-  Target Bodies(1) = 4
-  Equation = 1  ! Domain
-  Material = 4  ! XLPE
+  Target Bodies(1) = Integer 4
+  Equation = Integer 1  ! Domain
+  Material = Integer 4  ! XLPE
 End
 
 Body 5
   Name = Sheath
-  Target Bodies(1) = 5
-  Equation = 1  ! Domain
-  Material = 3  ! Copper
+  Target Bodies(1) = Integer 5
+  Equation = Integer 1  ! Domain
+  Material = Integer 3  ! Copper
   Sheath = Logical True
 End
 
 Body 6
   Name = Jacket
-  Target Bodies(1) = 6
-  Equation = 1  ! Domain
-  Material = 5  ! HDPE
+  Target Bodies(1) = Integer 6
+  Equation = Integer 1  ! Domain
+  Material = Integer 5  ! HDPE
 End
 
 Body 7
   Name = Air
-  Target Bodies(1) = 7
-  Equation = 1  ! Domain
-  Material = 1  ! Air
+  Target Bodies(1) = Integer 7
+  Equation = Integer 1  ! Domain
+  Material = Integer 1  ! Air
 End
 
 Boundary Condition 1
   Name = Inf
-  Target Boundaries(1) = 1
+  Target Boundaries(1) = Integer 1
   Infinity BC = Logical True
 End
 

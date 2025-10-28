@@ -1,36 +1,36 @@
 Air:
   Electric Conductivity: 0.0
-  Relative Permittivity: 1
-  Relative Permeability: 1
+  Relative Permittivity: 1.0
+  Relative Permeability: 1.0
 
 Aluminium:
   Electric Conductivity: 3.69e7
-  Relative Permittivity: 1
-  Relative Permeability: 1
-  Density: 2700
+  Relative Permittivity: 1.0
+  Relative Permeability: 1.0
+  Density: 2700.0
   Heat Conductivity: 205.0
 
 Copper:
   Electric Conductivity: 5.85e7
-  Relative Permittivity: 1
-  Relative Permeability: 1
-  Density: 8960
-  Heat Conductivity: 390
+  Relative Permittivity: 1.0
+  Relative Permeability: 1.0
+  Density: 8960.0
+  Heat Conductivity: 390.0
 
 XLPE:
   Electric Conductivity: 0.0
   Relative Permittivity: 2.3
-  Relative Permeability: 1
-  Density: 930
+  Relative Permeability: 1.0
+  Density: 930.0
   Heat Conductivity: 0.335
 
 HDPE:
   Electric Conductivity: 0.0
   Relative Permittivity: 2.3
-  Relative Permeability: 1
-  Density: 930
+  Relative Permeability: 1.0
+  Density: 930.0
   Heat Conductivity: 0.335
 
 Soil:
-  Density: 1400
+  Density: 1400.0
   Heat Conductivity: 0.268

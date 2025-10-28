@@ -1,9 +1,9 @@
 Metadata for SaveScalars file: results/electromagnetic.dat
 Elmer version: 9.0
 Elmer revision: Release
-Elmer compilation date: 2025-09-04
+Elmer compilation date: 2025-10-27
 Solver input file: electromagnetic.sif
-File started at: 2025/10/21 17:59:38
+File started at: 2025/10/28 17:18:19
  
 Variables in columns of matrix: 
    1: body int: joule heating e mask conductor1

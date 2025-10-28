@@ -16,12 +16,12 @@ Elmer.elmergrid_gmsh(data_path, "thermal.msh")
 
 Set up the electromagnetic part of the model
 """
-function setup_em(frequency::F, Icond::Real; sim_name::String="electromagnetic", circuit_file::String="circuit.definition") where {F<:Union{Real,Vector{<:Real}}}
+function setup_em(frequency::F, Icond::Real; sim_name::String="electromagnetic", circuit_file::String="circuit.definition") where {F <: Union{Real, Vector{<:Real}}}
     # Simulation parameters
     coord_scaling = 1e-3
-    sim_em = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(); coordinate_scale=coord_scaling, data=OrderedDict{String,Any}(
+    sim_em = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationScanning(); coordinate_scale=coord_scaling, data=OrderedDict{String, Any}(
         "Output Intervals" => 1,
-        "Steady State Max Iterations" => 1
+        "Steady State Max Iterations" => 1,
     ))
     update_simulation_data!(sim_em, Elmer.format_frequency(frequency))
 
@@ -38,20 +38,24 @@ function setup_em(frequency::F, Icond::Real; sim_name::String="electromagnetic",
     update_solver_data!(sif_em, solver_mgharm, "Quadratic Approximation", true)
 
     update_solver_data!(sif_em, save_scalars, "Filename", "$sim_name.dat")
-    update_solver_data!(sif_em, save_scalars, OrderedDict(
-        "Variable 1" => "joule heating e",
-        "Mask Name 1" => "Conductor1",
-        "Operator 1" => "body int",
-        "Variable 2" => "joule heating e",
-        "Mask Name 2" => "Conductor2",
-        "Operator 2" => "body int",
-        "Variable 3" => "joule heating e",
-        "Mask Name 3" => "Conductor3",
-        "Operator 3" => "body int",
-        "Variable 4" => "joule heating e",
-        "Mask Name 4" => "Sheath",
-        "Operator 4" => "body int"
-    ))
+    update_solver_data!(
+        sif_em,
+        save_scalars,
+        OrderedDict(
+            "Variable 1" => "joule heating e",
+            "Mask Name 1" => "Conductor1",
+            "Operator 1" => "body int",
+            "Variable 2" => "joule heating e",
+            "Mask Name 2" => "Conductor2",
+            "Operator 2" => "body int",
+            "Variable 3" => "joule heating e",
+            "Mask Name 3" => "Conductor3",
+            "Operator 3" => "body int",
+            "Variable 4" => "joule heating e",
+            "Mask Name 4" => "Sheath",
+            "Operator 4" => "body int",
+        ),
+    )
 
     update_solver_data!(sif_em, save_result, "Output File Name", sim_name)
 
@@ -100,9 +104,9 @@ end
 
 function setup_thermal(loss::Dict; sim_name::String="thermal")
     coord_scaling = 1e-3
-    sim_thermal = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(); coordinate_scale=coord_scaling, data=OrderedDict{String,Any}(
+    sim_thermal = Simulation(7, Elmer.CoordinateCartesian(), Elmer.SimulationSteady(); coordinate_scale=coord_scaling, data=OrderedDict{String, Any}(
         "Output Intervals" => 1,
-        "Steady State Max Iterations" => 1
+        "Steady State Max Iterations" => 1,
     ))
 
     sif_thermal = SolverInformationFile(sim_name, sim_thermal, data_path=data_path, mesh_db=sim_name)
@@ -124,11 +128,11 @@ function setup_thermal(loss::Dict; sim_name::String="thermal")
     mat_HDPE = load_material!(sif_thermal, "HDPE", materials_db)
 
     # Body forces
-    bf_conductor1 = add_body_force!(sif_thermal, "Conductor1"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor1"]))
-    bf_conductor2 = add_body_force!(sif_thermal, "Conductor2"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor2"]))
-    bf_conductor3 = add_body_force!(sif_thermal, "Conductor3"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Conductor3"]))
-    bf_sheath = add_body_force!(sif_thermal, "Sheath"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Sheath"]))
-    bf_dielectric = add_body_force!(sif_thermal, "Dielectric"; data=OrderedDict("Heat Source" => 1, "Integral Heat Source" => loss["Dielectric"]))
+    bf_conductor1 = add_body_force!(sif_thermal, "Conductor1"; data=OrderedDict("Heat Source" => 1.0, "Integral Heat Source" => loss["Conductor1"]))
+    bf_conductor2 = add_body_force!(sif_thermal, "Conductor2"; data=OrderedDict("Heat Source" => 1.0, "Integral Heat Source" => loss["Conductor2"]))
+    bf_conductor3 = add_body_force!(sif_thermal, "Conductor3"; data=OrderedDict("Heat Source" => 1.0, "Integral Heat Source" => loss["Conductor3"]))
+    bf_sheath = add_body_force!(sif_thermal, "Sheath"; data=OrderedDict("Heat Source" => 1.0, "Integral Heat Source" => loss["Sheath"]))
+    bf_dielectric = add_body_force!(sif_thermal, "Dielectric"; data=OrderedDict("Heat Source" => 1.0, "Integral Heat Source" => loss["Dielectric"]))
 
     # Bodies
     body_conductor1 = add_body!(sif_thermal, "Conductor1", [1]; equation=eq, material=mat_Al, body_force=bf_conductor1)
@@ -140,7 +144,7 @@ function setup_thermal(loss::Dict; sim_name::String="thermal")
     body_air = add_body!(sif_thermal, "Soil", [7]; equation=eq, material=mat_soil)
 
     # Boundary conditions
-    bc_surf = add_boundary_condition!(sif_thermal, "Surface", [1]; data=OrderedDict("Temperature" => 40))
+    bc_surf = add_boundary_condition!(sif_thermal, "Surface", [1]; data=OrderedDict("Temperature" => 40.0))
     bc_inf = add_boundary_condition!(sif_thermal, "Inf", [2]; data=OrderedDict("Infinity BC Temp" => true))
 
     # Generate sif
@@ -149,8 +153,8 @@ function setup_thermal(loss::Dict; sim_name::String="thermal")
     return sif_thermal
 end
 
-frequency = 50
-Icond = 515
+frequency = 50.0
+Icond = 515.0
 
 sif_em = setup_em(frequency, Icond)
 Elmer.elmer_solver(sif_em, log_file="solver_em.log")
@@ -171,6 +175,6 @@ sif_thermal = setup_thermal(Dict(
     "Conductor2" => Pj_cond2,
     "Conductor3" => Pj_cond3,
     "Sheath" => Pj_sheath,
-    "Dielectric" => Pj_diel
+    "Dielectric" => Pj_diel,
 ))
 Elmer.elmer_solver(sif_thermal, log_file="solver_thermal.log")
