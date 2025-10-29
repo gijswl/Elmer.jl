@@ -759,6 +759,20 @@ function elmer_solver(sif::SolverInformationFile; solver_path="ElmerSolver", log
     run(pipe)
 end
 
+function elmer_solver_mpi(sim_dir::String, n::Int = 4; solver_path="ElmerSolver_mpi", mpi_path="mpiexec", log_file="elmersolver.log")
+    logfile = joinpath(sim_dir, log_file)
+    cmd = Cmd(`$mpi_path -n $n $solver_path`, dir=sim_dir)
+    pipe = pipeline(cmd, stdout=logfile)
+    run(pipe)
+end
+
+function elmer_solver_mpi(sif::SolverInformationFile, n::Int = 4; solver_path="ElmerSolver_mpi", mpi_path="mpiexec", log_file="elmersolver.log")
+    logfile = joinpath(sif.data_path, log_file)
+    cmd = Cmd(`$mpi_path -n $n $solver_path $(sif.filename)`, dir=sif.data_path)
+    pipe = pipeline(cmd, stdout=logfile)
+    run(pipe)
+end
+
 """
     get_default_constants()
 
