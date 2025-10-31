@@ -238,6 +238,8 @@ Formats the (name, value) pair for writing to the SIF.
 If `value` is not a string, [`format_value`](@ref) is used to convert it.
 """
 function format_property(name::String, type, value::String)
+    lowercase(name) == "Include" && return "$name $value"
+
     if (typeof(type) <: Nothing)
         return "$name = $value"
     else
