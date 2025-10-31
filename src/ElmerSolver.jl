@@ -248,7 +248,7 @@ end
 format_property(name::String, value::Any) = format_property(name, format_type(value), format_value(value))
 
 function format_property(name::String, value::String) 
-    lowercase(name) == "Include" && return "$name \"$value\""
+    lowercase(name) == "include" && return "$name \"$value\""
 
     return "$name = $value"
 end
