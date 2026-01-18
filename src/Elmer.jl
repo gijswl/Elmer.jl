@@ -16,4 +16,6 @@ include("ElmerGrid.jl")
 export load_dat
 include("PostProcessing.jl")
 
+include("CircuitBuilder/CircuitBuilder.jl")
+
 end # module Elmer

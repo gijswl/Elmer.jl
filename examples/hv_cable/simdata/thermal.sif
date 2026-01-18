@@ -174,25 +174,25 @@ End
 Body Force 1
   Name = Conductor1
   Heat Source = Real 1.0
-  Integral Heat Source = Real 3.645575330429
+  Integral Heat Source = Real 3.645569029635
 End
 
 Body Force 2
   Name = Conductor2
   Heat Source = Real 1.0
-  Integral Heat Source = Real 3.645363255991
+  Integral Heat Source = Real 3.645354306385
 End
 
 Body Force 3
   Name = Conductor3
   Heat Source = Real 1.0
-  Integral Heat Source = Real 3.64561054859
+  Integral Heat Source = Real 3.645601602936
 End
 
 Body Force 4
   Name = Sheath
   Heat Source = Real 1.0
-  Integral Heat Source = Real 10.25163405879
+  Integral Heat Source = Real 10.25164461795
 End
 
 Body Force 5

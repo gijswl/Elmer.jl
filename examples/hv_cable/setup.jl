@@ -1,8 +1,6 @@
 using Elmer
+using Elmer.CircuitBuilder
 using OrderedCollections
-using PyCall
-
-cb = pyimport("elmer_circuitbuilder")
 
 data_path = joinpath(@__DIR__, "simdata\\")
 solvers_db = joinpath(@__DIR__, "solvers.yml")
@@ -82,19 +80,23 @@ function setup_em(frequency::F, Icond::Real; sim_name::String="electromagnetic",
     bc_inf = add_boundary_condition!(sif_em, "Inf", [1]; data=OrderedDict("Infinity BC" => true))
 
     # Circuit definition
-    c = cb.number_of_circuits(1)
+    c = create_circuits(1)
 
-    c[1].ref_node = 1
-    I1 = cb.I("I1", 1, 2, Icond * exp(+0π / 3 * 1im))
-    I2 = cb.I("I2", 1, 3, Icond * exp(+2π / 3 * 1im))
-    I3 = cb.I("I3", 1, 4, Icond * exp(-2π / 3 * 1im))
-    cond1 = cb.ElmerComponent("T1", 1, 2, 1, [PyObject(body_conductor1)])
-    cond2 = cb.ElmerComponent("T2", 1, 3, 2, [PyObject(body_conductor2)])
-    cond3 = cb.ElmerComponent("T3", 1, 4, 3, [PyObject(body_conductor3)])
-    c[1].components = [[I1, I2, I3, cond1, cond2, cond3]]
+    insert_component!(c[1], CurrentSource("I1", (1, 2), Icond * exp(+0im * 2π / 3)))
+    insert_component!(c[1], CurrentSource("I2", (1, 3), Icond * exp(+1im * 2π / 3)))
+    insert_component!(c[1], CurrentSource("I3", (1, 4), Icond * exp(-1im * 2π / 3)))
+    insert_component!(c[1], ElmerComponent("T1", (1, 2), 1, [body_conductor1]))
+    insert_component!(c[1], ElmerComponent("T2", (1, 3), 2, [body_conductor2]))
+    insert_component!(c[1], ElmerComponent("T3", (1, 4), 3, [body_conductor3]))
 
-    cb.generate_elmer_circuits(c, joinpath(data_path, circuit_file))
+    write_circuits(c, circuit_file; path=data_path)
+
     add_include!(sif_em, circuit_file)
+    components, body_forces = add_circuits!(sif_em, c)
+
+    add_coil_data!(sif_em, 1, CoilMassive())
+    add_coil_data!(sif_em, 2, CoilMassive())
+    add_coil_data!(sif_em, 3, CoilMassive())
 
     # Generate SIF
     Elmer.write(sif_em)

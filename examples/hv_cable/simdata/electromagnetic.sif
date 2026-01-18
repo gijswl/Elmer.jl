@@ -230,6 +230,16 @@ Body 7
   Material = Integer 1  ! Air
 End
 
+Body Force 1
+  Name = Circuit 1
+  I1_Source re = Real 515.0
+  I1_Source im = Real 0.0
+  I2_Source re = Real -257.4999999999999
+  I2_Source im = Real 446.00308294898593
+  I3_Source re = Real -257.4999999999999
+  I3_Source im = Real -446.00308294898593
+End
+
 Boundary Condition 1
   Name = Inf
   Target Boundaries(1) = Integer 1
@@ -240,3 +250,24 @@ End
 !---------------------------------------------------------
 ! Components
 !---------------------------------------------------------
+Component 1
+  Name = T1
+  Master Bodies(1) = Integer 1  ! Conductor1
+  Coil Type = Massive
+  Symmetry Coefficient = Real 1.0
+End
+
+Component 2
+  Name = T2
+  Master Bodies(1) = Integer 2  ! Conductor2
+  Coil Type = Massive
+  Symmetry Coefficient = Real 1.0
+End
+
+Component 3
+  Name = T3
+  Master Bodies(1) = Integer 3  ! Conductor3
+  Coil Type = Massive
+  Symmetry Coefficient = Real 1.0
+End
+
